@@ -364,6 +364,7 @@ function AbrController() {
                 logger.info('[' + type + '] switch from ' + oldQuality + ' to ' + newQuality + '/' + topQualityIdx + ' (buffer: ' + bufferLevel + ') ' + (reason ? JSON.stringify(reason) : '.'));
             }
             setQualityFor(type, id, newQuality);
+            // console.log('QUALITY_CHANGE_REQUESTED triggered');
             eventBus.trigger(Events.QUALITY_CHANGE_REQUESTED, {mediaType: type, streamInfo: streamInfo, oldQuality: oldQuality, newQuality: newQuality, reason: reason});
             const bitrate = throughputHistory.getAverageThroughput(type);
             if (!isNaN(bitrate)) {

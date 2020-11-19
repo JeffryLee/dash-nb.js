@@ -459,6 +459,7 @@ function MediaPlayer() {
             return false;
         }
         if (source) {
+            console.log('init');
             initializePlayback();
         } else {
             throw SOURCE_NOT_ATTACHED_ERROR;

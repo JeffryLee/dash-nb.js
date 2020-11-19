@@ -143,9 +143,12 @@ function GapController() {
     function getNextRangeStartTime(currentTime) {
         try {
             const ranges = videoModel.getBufferRange();
+
             if (!ranges || (ranges.length <= 1 && currentTime > 0)) {
                 return null;
             }
+            // console.log(ranges.start(0));
+            // console.log(ranges.end(0));
             let nextRangeStartTime = null;
             let j = 0;
 

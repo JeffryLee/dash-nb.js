@@ -236,6 +236,8 @@ function DashHandler(config) {
         request.adaptationIndex = representation.adaptation.index;
         request.representationId = representation.id;
 
+        // console.log(representation);
+
         if (setRequestUrl(request, url, representation)) {
             return request;
         }
@@ -317,6 +319,12 @@ function DashHandler(config) {
         let indexToRequest = segmentIndex + 1;
 
         logger.debug('Getting the next request at index: ' + indexToRequest);
+        // console.log('Getting the next request at index: ' + indexToRequest);
+
+        // console.log("====");
+        // console.log(representation);
+        // console.log("****");
+
         // check that there is a segment in this index
         const segment = segmentsController.getSegmentByIndex(representation, indexToRequest, lastSegment ? lastSegment.mediaStartTime : -1);
         if (!segment && isEndlessMedia(representation) && !dynamicStreamCompleted) {

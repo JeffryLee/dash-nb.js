@@ -214,12 +214,12 @@ function ScheduleController(config) {
                         });
                         checkPlaybackQuality = true;
 
-                        console.log('===========');
-                        console.log(instance);
-                        console.log(streamId);
-                        console.log(type);
-                        console.log(seekTarget);
-                        console.log(replacement);
+                        // console.log('===========');
+                        // console.log(instance);
+                        // console.log(streamId);
+                        // console.log(type);
+                        // console.log(seekTarget);
+                        // console.log(replacement);
                     }
                 }
             };

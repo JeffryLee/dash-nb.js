@@ -346,7 +346,8 @@ function BufferController(config) {
 
     function onQualityChanged(e) {
         if (e.streamInfo.id !== streamInfo.id || e.mediaType !== type || requiredQuality === e.newQuality) return;
-
+        
+        // console.log('onQualityChanged in Buffer Controller');
         updateBufferTimestampOffset(this.getRepresentationInfo(e.newQuality));
         requiredQuality = e.newQuality;
     }

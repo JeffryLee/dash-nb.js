@@ -248,6 +248,7 @@ function StreamProcessor(config) {
 
     function onQualityChanged(e) {
         if (type !== e.mediaType || streamInfo.id !== e.streamInfo.id) return;
+        // console.log('onQualityChanged in StreamProcessor');
         let representationInfo = getRepresentationInfo(e.newQuality);
         scheduleController.setCurrentRepresentation(representationInfo);
         dashMetrics.pushPlayListTraceMetrics(new Date(), PlayListTrace.REPRESENTATION_SWITCH_STOP_REASON);
@@ -442,11 +443,14 @@ function StreamProcessor(config) {
         }
     }
 
+    // the parameter e is an instance
     function onMediaFragmentNeeded(e) {
         if (!e.sender || e.mediaType !== type || e.streamId !== streamInfo.id) {
             return;
         }
         let request;
+
+        // console.log(e);
 
 
         // Don't schedule next fragments while pruning to avoid buffer inconsistencies
@@ -503,8 +507,8 @@ function StreamProcessor(config) {
                 ignoreIsFinished: true
             });
         } else {
-            console.log('No-requestToReplace');
-            console.log(representationInfo);
+            // console.log('No-requestToReplace');
+            // console.log(representationInfo);
             // Use time just whenever is strictly needed
             const useTime = hasSeekTarget || bufferPruned || bufferIsDivided;
             request = getFragmentRequest(representationInfo,
@@ -519,7 +523,7 @@ function StreamProcessor(config) {
                 request = getFragmentRequest(representationInfo);
             }
 
-            console.log(request);
+            // console.log(request);
         }
 
         return request;
@@ -716,6 +720,10 @@ function StreamProcessor(config) {
 
     function getFragmentRequest(representationInfo, time, options) {
         let fragRequest = null;
+
+        // console.log("====");
+        // console.log(representationInfo);
+        // console.log("****");
 
         if (indexHandler) {
             const representation = representationController && representationInfo ? representationController.getRepresentationForQuality(representationInfo.quality) : null;

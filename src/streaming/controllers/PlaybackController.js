@@ -348,8 +348,6 @@ function PlaybackController() {
         if (!config) return;
 
         if (config.streamController) {
-            console.log('enter streaming controller');
-            console.log('enter streaming controller1');
             streamController = config.streamController;
         }
         if (config.dashMetrics) {

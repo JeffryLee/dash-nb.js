@@ -95,6 +95,7 @@ function RepresentationController(config) {
         resetInitialSettings();
     }
 
+
     function getType() {
         return type;
     }
@@ -109,6 +110,8 @@ function RepresentationController(config) {
         startDataUpdate();
 
         voAvailableRepresentations = availableRepresentations;
+
+        // console.log(voAvailableRepresentations);
 
         currentVoRepresentation = getRepresentationForQuality(quality);
         realAdaptation = newRealAdaptation;
@@ -306,6 +309,8 @@ function RepresentationController(config) {
 
     function onQualityChanged(e) {
         if (e.mediaType !== getType() || streamId !== e.streamInfo.id) return;
+
+        // console.log('onQualityChanged in Representation Controller');
 
         currentVoRepresentation = getRepresentationForQuality(e.newQuality);
         addRepresentationSwitch();

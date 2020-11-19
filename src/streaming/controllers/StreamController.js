@@ -246,6 +246,7 @@ function StreamController() {
     }
 
     function startCheckIfPrebufferingCanStartInterval() {
+        console.log('startCheckIfPrebufferingCanStartInterval');
         if (!prebufferingCanStartInterval) {
             prebufferingCanStartInterval = setInterval(function () {
                 checkIfPrebufferingCanStart();
@@ -259,10 +260,16 @@ function StreamController() {
     }
 
     function checkIfPrebufferingCanStart() {
+        console.log(activeStream);
+        console.log(hasStreamFinishedBuffering(activeStream));
+        
         // In multiperiod situations, we constantly check if the streams have finished buffering so we can immediately start buffering the next stream
         if (!activeStream || !hasStreamFinishedBuffering(activeStream)) {
             return;
         }
+
+
+        
         const upcomingStreams = getNextStreams(activeStream);
         let i = 0;
 
@@ -272,7 +279,10 @@ function StreamController() {
             // If the preloading for the current stream is not scheduled, but its predecessor has finished buffering we can start prebuffering this stream
             if (!stream.getPreloadingScheduled() && (hasStreamFinishedBuffering(previousStream))) {
 
+                console.log('outter');
+
                 if (mediaSource) {
+                    console.log('inner');
                     // We can not start prebuffering if the start of the next period is in the future. This will cause problems when calculating the segmentAvailabilityRange and updating the representations in the RepresentationController
                     // As long as the timeline converter returns an invalid range we do not start the prebuffering
                     const mediaTypes = [Constants.VIDEO, Constants.AUDIO];
@@ -282,15 +292,22 @@ function StreamController() {
                         const mediaInfo = adapter.getMediaInfoForType(stream.getStreamInfo(), mediaType);
                         const voRepresentations = adapter.getVoRepresentations(mediaInfo);
                         voRepresentations.forEach((voRep) => {
-                            const range = timelineConverter.calcSegmentAvailabilityRange(voRep, true);
+                            const range = timelineConverter.calcSegmentAvailabilityRange(voRep, false);
+
+                            console.log(voRep);
 
                             if (range.end < range.start) {
+                                console.log(range.end);
+                                console.log(range.start);
                                 segmentAvailabilityRangeIsOk = false;
                             }
                         });
                     });
 
+                    console.log(segmentAvailabilityRangeIsOk);
+
                     if (segmentAvailabilityRangeIsOk) {
+                        console.log('preload start');
                         onStreamCanLoadNext(stream, previousStream);
                     }
                 }

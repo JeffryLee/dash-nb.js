@@ -466,6 +466,10 @@ function Stream(config) {
             streamProcessor.selectMediaInfo(allMediaForType[idx]); //sets the initial media info
         } else {
             streamProcessor.addMediaInfo(mediaInfo, true);
+            console.log(mediaInfo);
+            console.log(allMediaForType);
+            console.log(mediaSource);
+
         }
     }
 
