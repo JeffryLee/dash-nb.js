@@ -189,6 +189,7 @@ function BufferController(config) {
         }
     }
 
+
     function onInitFragmentLoaded(e) {
         if (e.chunk.streamId !== streamInfo.id || e.chunk.mediaInfo.type !== type) return;
 
@@ -800,7 +801,9 @@ function BufferController(config) {
         if (buffer && mediaInfo) { //if we have a prebuffer, we should prepare to discharge it, and make a new sourceBuffer ready
             if (typeof buffer.discharge === 'function') {
                 dischargeBuffer = buffer;
-                createBuffer(mediaInfo);
+                var createBufferb = createBuffer.bind(this);
+
+                createBufferb(mediaInfo);
             }
         }
     }

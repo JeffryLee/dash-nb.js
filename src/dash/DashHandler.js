@@ -236,7 +236,7 @@ function DashHandler(config) {
         request.adaptationIndex = representation.adaptation.index;
         request.representationId = representation.id;
 
-        // console.log(representation);
+        console.log(request.mediaType + request.index);
 
         if (setRequestUrl(request, url, representation)) {
             return request;

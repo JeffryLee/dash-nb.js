@@ -119,6 +119,7 @@ function ScheduleController(config) {
     }
 
     function start() {
+        console.log('schedule controller start');
         if (isStarted()) return;
         if (!currentRepresentationInfo || bufferController.getIsBufferingCompleted()) return;
 
@@ -130,6 +131,8 @@ function ScheduleController(config) {
             initialRequest = false;
         }
 
+        console.log('schedule controller start2');
+        
         startScheduleTimer(0);
     }
 

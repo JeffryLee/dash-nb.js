@@ -624,6 +624,7 @@ function Stream(config) {
     }
 
     function checkIfInitializationCompleted() {
+        console.log('checkIfInitializationCompleted');
         const ln = streamProcessors.length;
         const hasError = !!updateError.audio || !!updateError.video;
         let error = hasError ? new DashJSError(Errors.DATA_UPDATE_FAILED_ERROR_CODE, Errors.DATA_UPDATE_FAILED_ERROR_MESSAGE) : null;
@@ -634,9 +635,13 @@ function Stream(config) {
             }
         }
 
+        console.log('checkIfInitializationCompleted2');
+
         if (!isMediaInitialized) {
             return;
         }
+
+        console.log('checkIfInitializationCompleted3');
 
         if (protectionController) {
             // Need to check if streamProcessors exists because streamProcessors
@@ -649,18 +654,27 @@ function Stream(config) {
                 }
             }
         }
-
+        
+        // console.log('error');
         if (error) {
+            // console.log('is error');
             errHandler.error(error);
         } else if (!isStreamInitialized) {
+            // console.log('no error');
             isStreamInitialized = true;
             timelineConverter.setTimeSyncCompleted(true);
 
-            eventBus.trigger(Events.STREAM_INITIALIZED, {
-                streamInfo: streamInfo,
-                liveStartTime: !preloaded ? getLiveStartTime() : NaN
-            });
+            // console.log('in trigger');
+
+            // eventBus.trigger(Events.STREAM_INITIALIZED, {
+            //     streamInfo: streamInfo,
+            //     liveStartTime: !preloaded ? getLiveStartTime() : NaN
+            // });
+
+            // console.log('out trigger');
         }
+        // console.log('streamProcessors');
+        // console.log(streamProcessors);
 
         // (Re)start ScheduleController:
         // - in case stream initialization has been completed after 'play' event (case for SegmentBase streams)
@@ -919,6 +933,8 @@ function Stream(config) {
             initializeMediaForType(Constants.IMAGE, mediaSource);
 
             createBuffers(previousBuffers);
+
+            console.log('start ScheduleController');
 
             eventBus.on(Events.CURRENT_TRACK_CHANGED, onCurrentTrackChanged, instance);
             for (let i = 0; i < streamProcessors.length && streamProcessors[i]; i++) {

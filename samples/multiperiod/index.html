@@ -13,11 +13,14 @@
         function init() {
             var video,
                 player,
+                player2,
                 url = "https://dash.akamaized.net/dash264/TestCases/5a/nomor/1.mpd";
 
             video = document.querySelector("video");
             player = dashjs.MediaPlayer().create();
+            player2 = dashjs.MediaPlayer().create();
             player.initialize(video, url, true);
+            // player2.initialize(video, "https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd", true);
         }
     </script>
 

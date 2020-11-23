@@ -458,12 +458,17 @@ function MediaPlayer() {
         if (videoModel.getElement() || streamingInitialized) {
             return false;
         }
+
+        
+
         if (source) {
             console.log('init');
             initializePlayback();
         } else {
             throw SOURCE_NOT_ATTACHED_ERROR;
         }
+
+        // resetPlaybackControllers();
     }
 
     /**
@@ -1350,11 +1355,11 @@ function MediaPlayer() {
             }
         }
 
-        if (playbackInitialized) { //Reset if we have been playing before, so this is a new element.
-            resetPlaybackControllers();
-        }
+        // if (playbackInitialized) { //Reset if we have been playing before, so this is a new element.
+        //     resetPlaybackControllers();
+        // }
 
-        initializePlayback();
+        // initializePlayback();
     }
 
     /**

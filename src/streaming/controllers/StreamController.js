@@ -260,8 +260,8 @@ function StreamController() {
     }
 
     function checkIfPrebufferingCanStart() {
-        console.log(activeStream);
-        console.log(hasStreamFinishedBuffering(activeStream));
+        // console.log(activeStream);
+        // console.log(hasStreamFinishedBuffering(activeStream));
         
         // In multiperiod situations, we constantly check if the streams have finished buffering so we can immediately start buffering the next stream
         if (!activeStream || !hasStreamFinishedBuffering(activeStream)) {
@@ -279,10 +279,7 @@ function StreamController() {
             // If the preloading for the current stream is not scheduled, but its predecessor has finished buffering we can start prebuffering this stream
             if (!stream.getPreloadingScheduled() && (hasStreamFinishedBuffering(previousStream))) {
 
-                console.log('outter');
-
                 if (mediaSource) {
-                    console.log('inner');
                     // We can not start prebuffering if the start of the next period is in the future. This will cause problems when calculating the segmentAvailabilityRange and updating the representations in the RepresentationController
                     // As long as the timeline converter returns an invalid range we do not start the prebuffering
                     const mediaTypes = [Constants.VIDEO, Constants.AUDIO];
@@ -304,10 +301,7 @@ function StreamController() {
                         });
                     });
 
-                    console.log(segmentAvailabilityRangeIsOk);
-
                     if (segmentAvailabilityRangeIsOk) {
-                        console.log('preload start');
                         onStreamCanLoadNext(stream, previousStream);
                     }
                 }
@@ -564,6 +558,7 @@ function StreamController() {
     }
 
     function switchToVideoElement(seekTime) {
+        console.log('seekTime:' +seekTime);
         if (activeStream) {
             playbackController.initialize(getActiveStreamInfo());
             openMediaSource(seekTime, false, true, false);
