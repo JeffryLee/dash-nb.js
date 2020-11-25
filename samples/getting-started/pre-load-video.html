@@ -20,6 +20,11 @@
             player = dashjs.MediaPlayer().create();
             player.initialize(null, url, true);
             player.preload();
+
+
+            player2 = dashjs.MediaPlayer().create();
+            player2.initialize(null, "https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd", true);
+            player2.preload();
         }
 
         function attachVideoPlayer() {
@@ -33,9 +38,25 @@
             
             player.attachView(video);
             // player.attachView(video);
+            
+        }
 
+        function attachVideoPlayer2() {
+            var videoContainer = document.getElementById('videoContainer');
+            if (!video) {
+                video = document.createElement('video');
+                video.controls = true;
+                videoContainer.appendChild(video);
+            }
 
             
+            player2.attachView(video);
+            // player.attachView(video);
+            
+        }
+        function getNextSegment() {            
+            player.attachView(video);
+            // player.attachView(video);
         }
     </script>
 
@@ -54,6 +75,9 @@
     </div>
     <div>
         <button onclick="attachVideoPlayer()">Attach View</button>
+    </div>
+    <div>
+        <button onclick="attachVideoPlayer2()">Attach View2</button>
     </div>
     <div id="videoContainer">
     </div>
