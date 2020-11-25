@@ -236,11 +236,13 @@ function DashHandler(config) {
         request.adaptationIndex = representation.adaptation.index;
         request.representationId = representation.id;
 
-        console.log(request.mediaType + request.index);
+        
 
         if (setRequestUrl(request, url, representation)) {
+            console.log(request.mediaType + request.index + " " + request.url);
             return request;
         }
+        
     }
 
     function isMediaFinished(representation) {
