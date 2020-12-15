@@ -13,7 +13,8 @@
     <script class="code">
         var video,
             players,
-            idx
+            idx,
+            superplayer
 
         function init() {
             var urls = ["https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd", "https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd", "https://dash.akamaized.net/dash264/TestCasesIOP41/MultiTrack/alternative_content/1/manifest_alternative_content_live.mpd"];
@@ -26,6 +27,8 @@
                 players[i].initialize(null, urls[i], true);
                 players[i].preload();
             }
+
+            superplayer = dashjs.SuperPlayer().create();
 
         }
 
@@ -51,6 +54,8 @@
             players[idx].reset();
             idx = idx + 1;
             players[idx].attachView(video);
+            superplayer.add();
+            alert(superplayer.query());
         }
     </script>
 

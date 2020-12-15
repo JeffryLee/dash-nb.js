@@ -35,11 +35,13 @@ import MetricsReporting from './src/streaming/metrics/MetricsReporting';
 import Protection from './src/streaming/protection/Protection';
 import MediaPlayerFactory from './src/streaming/MediaPlayerFactory';
 import Debug from './src/core/Debug';
+import SuperPlayer from './src/streaming/SuperPlayer';
 
 dashjs.Protection = Protection;
 dashjs.MetricsReporting = MetricsReporting;
 dashjs.MediaPlayerFactory = MediaPlayerFactory;
 dashjs.Debug = Debug;
+dashjs.SuperPlayer = SuperPlayer;
 
 export default dashjs;
-export { MediaPlayer, Protection, MetricsReporting, MediaPlayerFactory, Debug};
+export { MediaPlayer, Protection, MetricsReporting, MediaPlayerFactory, Debug, SuperPlayer};
