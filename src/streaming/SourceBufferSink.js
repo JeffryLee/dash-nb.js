@@ -136,7 +136,9 @@ function SourceBufferSink(mediaSource, mediaInfo, onAppendedCallback, oldBuffer)
     }
 
     function getAllBufferRanges() {
+        // console.log(buffer);
         try {
+            // console.log(buffer.buffered);
             return buffer.buffered;
         } catch (e) {
             logger.error('getAllBufferRanges exception: ' + e.message);

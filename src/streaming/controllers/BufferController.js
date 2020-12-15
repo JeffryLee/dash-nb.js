@@ -157,6 +157,7 @@ function BufferController(config) {
     }
 
     function dischargePreBuffer() {
+        // console.log('dischargeBuffer called ========');
         if (buffer && dischargeBuffer && typeof dischargeBuffer.discharge === 'function') {
             const ranges = dischargeBuffer.getAllBufferRanges();
 
@@ -472,6 +473,8 @@ function BufferController(config) {
     }
 
     function getRangeAt(time, tolerance) {
+        // console.log(buffer);
+        // console.log(buffer.getBuffer().buffered);
         const ranges = buffer.getAllBufferRanges();
         let start = 0;
         let end = 0;

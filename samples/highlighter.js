@@ -2,9 +2,9 @@ var head = document.head || document.getElementsByTagName('head')[0];
 var body = document.body || document.getElementsByTagName('body')[0];
 var style = document.createElement('link');
 style.setAttribute('rel', 'stylesheet');
-style.setAttribute('href', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow.min.css');
+style.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow.min.css');
 var script = document.createElement('script');
-script.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js');
+script.setAttribute('src', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js');
 
 head.append(style);
 head.append(script);

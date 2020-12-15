@@ -463,6 +463,7 @@ function MediaPlayer() {
 
         if (source) {
             console.log('init');
+            console.log(source);
             initializePlayback();
         } else {
             throw SOURCE_NOT_ATTACHED_ERROR;
@@ -1346,11 +1347,14 @@ function MediaPlayer() {
         videoModel.setElement(element);
 
         if (element) {
-            detectProtection();
-            detectMetricsReporting();
-            detectMss();
-
+            // The following three function is not callled
+            // detectProtection();
+            // detectMetricsReporting();
+            // detectMss();
+            
+            console.log("streamController out");
             if (streamController) {
+                console.log("streamController called");
                 streamController.switchToVideoElement();
             }
         }
@@ -1362,6 +1366,10 @@ function MediaPlayer() {
         // initializePlayback();
     }
 
+
+    function setView(element) {
+        videoModel.setElement(element);
+    }
     /**
      * Returns instance of Div that was attached by calling attachTTMLRenderingDiv()
      * @returns {Object}
@@ -2227,6 +2235,7 @@ function MediaPlayer() {
         off: off,
         extend: extend,
         attachView: attachView,
+        setView: setView,
         attachSource: attachSource,
         isReady: isReady,
         preload: preload,

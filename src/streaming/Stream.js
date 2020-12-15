@@ -225,6 +225,9 @@ function Stream(config) {
         for (let i = 0; i < streamProcessors.length; i++) {
             //Adding of new tracks to a stream processor isn't guaranteed by the spec after the METADATA_LOADED state
             //so do this after the buffers are created above.
+            console.log('streamProcessors.length: ' + streamProcessors.length);
+            console.log(streamProcessors[i].getMediaInfo());
+            
             streamProcessors[i].dischargePreBuffer();
         }
 
@@ -466,9 +469,9 @@ function Stream(config) {
             streamProcessor.selectMediaInfo(allMediaForType[idx]); //sets the initial media info
         } else {
             streamProcessor.addMediaInfo(mediaInfo, true);
-            console.log(mediaInfo);
-            console.log(allMediaForType);
-            console.log(mediaSource);
+            // console.log(mediaInfo);
+            // console.log(allMediaForType);
+            // console.log(mediaSource);
 
         }
     }

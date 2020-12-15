@@ -215,6 +215,7 @@ function StreamController() {
         } else {
             if (isPaused) {
                 isPaused = false;
+                console.log("resume");
                 createPlaylistMetrics(PlayList.RESUME_FROM_PAUSE_START_REASON);
             }
         }
@@ -223,6 +224,7 @@ function StreamController() {
     function onPlaybackPaused(e) {
         logger.debug('[onPlaybackPaused]');
         if (!e.ended) {
+            console.log("paused");
             isPaused = true;
             flushPlaylistMetrics(PlayListTrace.USER_REQUEST_STOP_REASON);
         }
@@ -291,11 +293,11 @@ function StreamController() {
                         voRepresentations.forEach((voRep) => {
                             const range = timelineConverter.calcSegmentAvailabilityRange(voRep, false);
 
-                            console.log(voRep);
+                            // console.log(voRep);
 
                             if (range.end < range.start) {
-                                console.log(range.end);
-                                console.log(range.start);
+                                // console.log(range.end);
+                                // console.log(range.start);
                                 segmentAvailabilityRangeIsOk = false;
                             }
                         });
@@ -668,6 +670,8 @@ function StreamController() {
     function composeStreams() {
         try {
             const streamsInfo = adapter.getStreamsInfo();
+            console.log("streamsInfo");
+            console.log(streamsInfo);
             if (streamsInfo.length === 0) {
                 throw new Error('There are no streams');
             }

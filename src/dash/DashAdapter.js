@@ -316,6 +316,9 @@ function DashAdapter() {
         const streams = [];
         let voLocalPeriods = voPeriods;
 
+        console.log('voPeriods');
+        console.log(voPeriods);
+
         //if manifest is defined, getStreamsInfo is for an outside manifest, not the current one
         if (externalManifest) {
             checkConfig();
