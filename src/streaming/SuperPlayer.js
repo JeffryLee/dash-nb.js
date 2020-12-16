@@ -78,6 +78,7 @@ import { checkParameterType } from './utils/SupervisorTools';
 import ManifestUpdater from './ManifestUpdater';
 import URLUtils from '../streaming/utils/URLUtils';
 import BoxParser from './utils/BoxParser';
+import MediaPlayer from './MediaPlayer';
 
 /**
  * @module SuperPlayer
@@ -87,9 +88,19 @@ import BoxParser from './utils/BoxParser';
  */
 function SuperPlayer() {
 
+    const context = this.context;
+
+    const queueLength = 8;
+
     let instance,
         players,
-        idx;
+        player1,
+        player2,
+        urls,
+        // the index to the video that current playing
+        playIdx,
+        // the index to the video that current buffering
+        loadIdx;
 
     /*
     ---------------------------------------------------------------------------
@@ -99,10 +110,21 @@ function SuperPlayer() {
     ---------------------------------------------------------------------------
     */
     function setup() {
-        idx = 0;
+        playIdx = 0;
+        loadIdx = 0;
+        players = []
 
-        // MediaPlayerModel(context).getInstance();
-        
+        for (i = 0; i < queueLength; i++) {
+            players.push(MediaPlayer().create());
+        }
+    }
+
+    function pushToQueue() {
+
+    }
+
+    function popFromQueue() {
+
     }
 
     function setConfig(config) {
