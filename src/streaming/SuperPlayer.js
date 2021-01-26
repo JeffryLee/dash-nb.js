@@ -94,12 +94,13 @@ function SuperPlayer() {
 
     let instance,
         players,
+        playerview,
         player1,
         player2,
         urls,
         // the index to the video that current playing
         playIdx,
-        // the index to the video that current buffering
+        // the index to the video that next buffering
         loadIdx;
 
     /*
@@ -114,50 +115,74 @@ function SuperPlayer() {
         loadIdx = 0;
         players = []
 
-        for (i = 0; i < queueLength; i++) {
+        for (var i = 0; i < queueLength; i++) {
             players.push(MediaPlayer().create());
+            players[i].initialize(null, null, true);
         }
     }
 
-    function pushToQueue() {
+    // players[i].initialize(null, urls[i], true);
 
+    function attachSource(source) {
+        var ret = pushToQueue(source);
+        return ret;
+    }
+
+    function pushToQueue(source) {
+        var idx = (loadIdx + 1) % queueLength;
+
+        if (idx == playIdx) {
+            return -1;
+        }
+
+        // need to check whether the player is initialized;
+
+        // players[loadIdx].initialize(null, source, true);
+        players[loadIdx].attachSource(source);
+        players[loadIdx].preload();
+
+        loadIdx = idx;
+
+        return 0;
+    }
+
+    function attachView(view) {
+        playerview = view;
     }
 
     function popFromQueue() {
+        console.log('playIdx: '+playIdx);
+        console.log('loadIdx: '+loadIdx);
 
+        if (playIdx == loadIdx) {
+            return -1;
+        }
+        
+        players[playIdx].reset();
+
+        playIdx = playIdx + 1;
+
+        playIdx = playIdx % queueLength;
+
+        return 0;
+    }
+
+    function playNext() {
+        var ret = popFromQueue();
+        if (ret == 0) {
+
+            if (playIdx != loadIdx) {
+                players[playIdx].attachView(playerview);
+            }
+
+            return ret;
+        } else {
+            return ret;
+        }
     }
 
     function setConfig(config) {
-        // if (!config) {
-        //     return;
-        // }
-        // if (config.capabilities) {
-        //     capabilities = config.capabilities;
-        // }
-        // if (config.streamController) {
-        //     streamController = config.streamController;
-        // }
-        // if (config.gapController) {
-        //     gapController = config.gapController;
-        // }
-        // if (config.playbackController) {
-        //     playbackController = config.playbackController;
-        // }
-        // if (config.mediaPlayerModel) {
-        //     mediaPlayerModel = config.mediaPlayerModel;
-        // }
-        // if (config.abrController) {
-        //     abrController = config.abrController;
-        // }
-        // if (config.schemeLoaderFactory) {
-        //     schemeLoaderFactory = config.schemeLoaderFactory;
-        // }
-        // if (config.mediaController) {
-        //     mediaController = config.mediaController;
-        // }
-        // if (config.settings) {
-        //     settings = config.settings;
-        // }
+
     }
 
     function add() {
@@ -174,7 +199,10 @@ function SuperPlayer() {
         // initialize: initialize,
         setConfig: setConfig,
         add: add,
-        query: query
+        query: query,
+        attachSource: attachSource,
+        attachView: attachView,
+        playNext: playNext
     };
 
     setup();

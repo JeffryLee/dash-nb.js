@@ -17,7 +17,7 @@
             superplayer
 
         function init() {
-            // var urls = ["https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd", "https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd", "https://dash.akamaized.net/dash264/TestCasesIOP41/MultiTrack/alternative_content/1/manifest_alternative_content_live.mpd"];
+            var urls = ["https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd", "https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd", "https://dash.akamaized.net/dash264/TestCasesIOP41/MultiTrack/alternative_content/1/manifest_alternative_content_live.mpd"];
 
             // players = [];
             // idx = 0
@@ -29,10 +29,22 @@
             // }
 
             superplayer = dashjs.SuperPlayer().create();
+            var videoContainer = document.getElementById('videoContainer');
+            if (!video) {
+                video = document.createElement('video');
+                video.controls = true;
+                videoContainer.appendChild(video);
+            }
+
+            for (i = 0; i < 3; i++) {
+                superplayer.attachSource(urls[i]);
+            }
+            
+            superplayer.attachView(video);
 
         }
 
-        function attachVideoPlayer() {
+        // function attachVideoPlayer() {
             // var videoContainer = document.getElementById('videoContainer');
             // if (!video) {
             //     video = document.createElement('video');
@@ -44,18 +56,19 @@
             // players[idx].attachView(video);
             // player.attachView(video);
             
-        }
+        // }
         
-        function getNextSegment() {            
+        // function getNextSegment() {            
             // player.attachView(video);
-        }
+        // }
 
         function next() {            
             // players[idx].reset();
             // idx = idx + 1;
             // players[idx].attachView(video);
-            superplayer.add();
-            alert(superplayer.query());
+            // superplayer.add();
+            // alert(superplayer.query());
+            superplayer.playNext();
         }
     </script>
 
@@ -72,9 +85,9 @@
         This sample shows how to use preload feature of dash.js. In this sample, streaming is initialized and dash.js starts downloading stream segments as soon as the page is loaded. Right when the user clicks "Attach View" the video element is created,
         attached to the already initialized dash.js MediaPlayer and then playback starts.
     </div>
-    <div>
+    <!-- <div>
         <button onclick="attachVideoPlayer()">Attach View</button>
-    </div>
+    </div> -->
     <div>
         <button onclick="next()">Next</button>
     </div>
