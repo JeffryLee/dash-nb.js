@@ -31,6 +31,7 @@
 import Constants from '../constants/Constants';
 import MetricsConstants from '../constants/MetricsConstants';
 import BufferLevelRule from '../rules/scheduling/BufferLevelRule';
+import BufferQuota from '../rules/scheduling/BufferQuota';
 import FragmentModel from '../models/FragmentModel';
 import EventBus from '../../core/EventBus';
 import Events from '../../core/events/Events';
@@ -76,7 +77,8 @@ function ScheduleController(config) {
         replacingBuffer,
         mediaRequest,
         checkPlaybackQuality,
-        isReplacementRequest;
+        isReplacementRequest,
+        bufferQuota;
 
     function setup() {
         logger = Debug(context).getInstance().getLogger(instance);
@@ -108,6 +110,12 @@ function ScheduleController(config) {
         eventBus.on(Events.URL_RESOLUTION_FAILED, onURLResolutionFailed, this);
         eventBus.on(Events.FRAGMENT_LOADING_ABANDONED, onFragmentLoadingAbandoned, this);
         eventBus.on(Events.BUFFERING_COMPLETED, onBufferingCompleted, this);
+        eventBus.on(Events.INITQUOTA, onInitQuota, this);
+        // eventBus.on(Events.TESTEVENT, talert, this);
+
+
+        eventBus.trigger(Events.INITQUOTAREQUEST);
+        
     }
 
     function setCurrentRepresentation(representationInfo) {
@@ -158,6 +166,11 @@ function ScheduleController(config) {
 
     }
 
+    // function talert() {
+        // let status = bufferQuota.checkQuota();
+        // alert('quota: '+status);
+    // }
+
     function schedule() {
         if (isStopped || isFragmentProcessingInProgress ||
             (playbackController.isPaused() && !settings.get().streaming.scheduleWhilePaused) ||
@@ -169,18 +182,22 @@ function ScheduleController(config) {
 
         validateExecutedFragmentRequest();
 
-        console.log('in schedule');
-
         const isReplacement = replaceRequestArray.length > 0;
+
+        if (typeof bufferQuota !== 'undefined') {
+            console.log(bufferQuota);
+            let status = bufferQuota.checkQuota();
+            console.log('9999999999999999999');
+            console.log(status);
+        }
+
+        
         // bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack) checks the buffer length
         if (replacingBuffer || isNaN(lastInitQuality) || switchTrack || isReplacement ||
             hasTopQualityChanged(type, streamId) ||
             bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack)) {
 
-                console.log('in ttt');
-
             const getNextFragment = function () {
-                console.log('in getNextFragment');
                 if ((currentRepresentationInfo.quality !== lastInitQuality || switchTrack) && (!replacingBuffer)) {
                     if (switchTrack) {
                         logger.debug('Switch track for ' + type + ', representation id = ' + currentRepresentationInfo.id);
@@ -222,12 +239,12 @@ function ScheduleController(config) {
                         });
                         checkPlaybackQuality = true;
 
-                        console.log('===========');
-                        console.log(instance);
-                        console.log(streamId);
-                        console.log(type);
-                        console.log(seekTarget);
-                        console.log(replacement);
+                        // console.log('===========');
+                        // console.log(instance);
+                        // console.log(streamId);
+                        // console.log(type);
+                        // console.log(seekTarget);
+                        // console.log(replacement);
                     }
                 }
             };
@@ -464,6 +481,10 @@ function ScheduleController(config) {
         stop();
     }
 
+    function onInitQuota(e) {
+        bufferQuota = e.quota;
+    }
+
     function onPlaybackStarted() {
         if (isStopped || !settings.get().streaming.scheduleWhilePaused) {
             start();
@@ -556,6 +577,7 @@ function ScheduleController(config) {
         eventBus.off(Events.URL_RESOLUTION_FAILED, onURLResolutionFailed, this);
         eventBus.off(Events.FRAGMENT_LOADING_ABANDONED, onFragmentLoadingAbandoned, this);
         eventBus.off(Events.BUFFERING_COMPLETED, onBufferingCompleted, this);
+        eventBus.off(Events.INITQUOTA, onInitQuota, this);
 
         stop();
         completeQualityChange(false);

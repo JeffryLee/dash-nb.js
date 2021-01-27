@@ -84,6 +84,8 @@ class CoreEvents extends EventsBase {
         this.SEGMENTBASE_SEGMENTSLIST_REQUEST_NEEDED = 'segmentBaseSegmentsListRequestNeeded';
         this.SEEK_TARGET = 'seekTarget';
         this.DYNAMIC_STREAM_COMPLETED = 'dynamicStreamCompleted';
+        this.INITQUOTA = 'initQuota';
+        this.INITQUOTAREQUEST = 'initQuotaRequest';
         this.TESTEVENT = 'testEvent';
     }
 }

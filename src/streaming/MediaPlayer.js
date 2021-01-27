@@ -58,6 +58,8 @@ import Events from './../core/events/Events';
 import MediaPlayerEvents from './MediaPlayerEvents';
 import FactoryMaker from '../core/FactoryMaker';
 import Settings from '../core/Settings';
+import BufferQuota from './rules/scheduling/BufferQuota';
+
 import {
     getVersionString
 }
@@ -157,7 +159,9 @@ function MediaPlayer() {
         domStorage,
         segmentBaseController,
         superEventBus,
-        playerId;
+        playerId,
+        sonFlag,
+        bufferQuota;
 
     /*
     ---------------------------------------------------------------------------
@@ -181,6 +185,7 @@ function MediaPlayer() {
         mediaPlayerModel = MediaPlayerModel(context).getInstance();
         videoModel = VideoModel(context).getInstance();
         uriFragmentModel = URIFragmentModel(context).getInstance();
+        sonFlag = false;
     }
 
 
@@ -469,6 +474,8 @@ function MediaPlayer() {
         } else {
             throw SOURCE_NOT_ATTACHED_ERROR;
         }
+
+        initQuota();
 
         // resetPlaybackControllers();
     }
@@ -1368,11 +1375,13 @@ function MediaPlayer() {
     }
 
 
+
     function setView(element) {
         videoModel.setElement(element);
     }
 
     function registerSuperEvent(superbus) {
+        
         superEventBus = superbus;
         superEventBus.on(Events.TESTEVENT, talert, instance);
     }
@@ -1381,14 +1390,42 @@ function MediaPlayer() {
         superEventBus.off(Events.TESTEVENT, talert, instance);    
     }
 
+    function initQuota () {
+        bufferQuota = BufferQuota(context).create({});
+
+        const handler = function () {
+
+            eventBus.trigger(Events.INITQUOTA, {
+                quota: bufferQuota
+            });
+
+            eventBus.off(Events.INITQUOTAREQUEST, handler, self);
+        };
+
+        eventBus.on(Events.INITQUOTAREQUEST, handler, self);
+    }
+
     function setPlayerId (id) {
         playerId = id;
     }
+
+    function initSonPlayer (id, superbus) {
+        sonFlag = true;
+        setPlayerId(id);
+        registerSuperEvent(superbus);
+    }
     
     function talert(e) {
-        if (e.id == playerId){
-            alert("supereventbuswork");
+        // if (e.id == playerId){
+        //     bufferQuota.assignQuota();
+        // }
+
+        if (typeof bufferQuota !== 'undefined') {
+            bufferQuota.assignQuota();
         }
+
+        
+        // eventBus.trigger(Events.TESTEVENT);
     }
 
 
@@ -2258,9 +2295,7 @@ function MediaPlayer() {
         extend: extend,
         attachView: attachView,
         setView: setView,
-        registerSuperEvent: registerSuperEvent,
-        unregisterSuperEvent: unregisterSuperEvent,
-        setPlayerId: setPlayerId,
+        initSonPlayer: initSonPlayer,
         attachSource: attachSource,
         isReady: isReady,
         preload: preload,

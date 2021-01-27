@@ -28,16 +28,18 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
-import Constants from '../../constants/Constants';
+// import Constants from '../../constants/Constants';
 import FactoryMaker from '../../../core/FactoryMaker';
-import MetricsConstants from '../../constants/MetricsConstants';
+// import MetricsConstants from '../../constants/MetricsConstants';
 
 function BufferQuota(config) {
 
     config = config || {};
-    quota = 0;
+    let quota;
+    
 
     function setup() {
+        quota = 0;
     }
 
     function assignQuota () {
@@ -45,11 +47,7 @@ function BufferQuota(config) {
     }
 
     function checkQuota () {
-        if (quota > 0) {
-            return true;
-        }
-
-        return false;
+        return quota;
     }
 
     function decreaseQuota () {
@@ -57,49 +55,11 @@ function BufferQuota(config) {
             quota -= 1;
         }
     }
-    // function execute(type, representationInfo) {
-    //     if (!type || !representationInfo) {
-    //         return true;
-    //     }
-    //     const bufferLevel = dashMetrics.getCurrentBufferLevel(type);
-    //     return bufferLevel < getBufferTarget(type, representationInfo);
-    // }
-
-    // function getBufferTarget(type, representationInfo) {
-    //     let bufferTarget = NaN;
-
-    //     if (!type || !representationInfo) {
-    //         return bufferTarget;
-    //     }
-
-    //     if (type === Constants.FRAGMENTED_TEXT) {
-    //         if (textController.isTextEnabled()) {
-    //             if (isNaN(representationInfo.fragmentDuration)) { //fragmentDuration of representationInfo is not defined,
-    //                 // call metrics function to have data in the latest scheduling info...
-    //                 // if no metric, returns 0. In this case, rule will return false.
-    //                 const schedulingInfo = dashMetrics.getCurrentSchedulingInfo(MetricsConstants.SCHEDULING_INFO);
-    //                 bufferTarget = schedulingInfo ? schedulingInfo.duration : 0;
-    //             } else {
-    //                 bufferTarget = representationInfo.fragmentDuration;
-    //             }
-    //         } else { // text is disabled, rule will return false
-    //             bufferTarget = 0;
-    //         }
-    //     }  else {
-    //         const streamInfo = representationInfo.mediaInfo.streamInfo;
-    //         if (abrController.isPlayingAtTopQuality(streamInfo)) {
-    //             const isLongFormContent = streamInfo.manifestInfo.duration >= settings.get().streaming.longFormContentDurationThreshold;
-    //             bufferTarget = isLongFormContent ? settings.get().streaming.bufferTimeAtTopQualityLongForm : settings.get().streaming.bufferTimeAtTopQuality;
-    //         } else {
-    //             bufferTarget = mediaPlayerModel.getStableBufferTime();
-    //         }
-    //     }
-    //     return bufferTarget;
-    // }
 
     const instance = {
-        execute: execute,
-        getBufferTarget: getBufferTarget
+        assignQuota: assignQuota,
+        checkQuota: checkQuota,
+        decreaseQuota: decreaseQuota
     };
 
     setup();

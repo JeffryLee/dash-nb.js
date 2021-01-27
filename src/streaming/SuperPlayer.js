@@ -118,8 +118,8 @@ function SuperPlayer() {
         for (var i = 0; i < queueLength; i++) {
             players.push(MediaPlayer().create());
             players[i].initialize(null, null, true);
-            players[i].setPlayerId(i);
-            players[i].registerSuperEvent(superEventBus);
+            players[i].initSonPlayer(i, superEventBus);
+            // players[i].registerSuperEvent();
         }
 
         
@@ -175,7 +175,7 @@ function SuperPlayer() {
 
     function playNext() {
         superEventBus.trigger(Events.TESTEVENT, {
-            id: i
+            id: playIdx
         });
         var ret = popFromQueue();
         if (ret == 0) {
