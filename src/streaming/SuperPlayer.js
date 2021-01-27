@@ -89,15 +89,15 @@ import MediaPlayer from './MediaPlayer';
 function SuperPlayer() {
 
     const context = this.context;
+    const superEventBus = EventBus(context).getInstance();
 
     const queueLength = 8;
+
+    
 
     let instance,
         players,
         playerview,
-        player1,
-        player2,
-        urls,
         // the index to the video that current playing
         playIdx,
         // the index to the video that next buffering
@@ -118,10 +118,16 @@ function SuperPlayer() {
         for (var i = 0; i < queueLength; i++) {
             players.push(MediaPlayer().create());
             players[i].initialize(null, null, true);
+            players[i].setPlayerId(i);
+            players[i].registerSuperEvent(superEventBus);
         }
+
+        
     }
 
     // players[i].initialize(null, urls[i], true);
+
+
 
     function attachSource(source) {
         var ret = pushToQueue(source);
@@ -168,6 +174,9 @@ function SuperPlayer() {
     }
 
     function playNext() {
+        superEventBus.trigger(Events.TESTEVENT, {
+            id: i
+        });
         var ret = popFromQueue();
         if (ret == 0) {
 
@@ -179,6 +188,7 @@ function SuperPlayer() {
         } else {
             return ret;
         }
+        
     }
 
     function setConfig(config) {

@@ -155,7 +155,9 @@ function MediaPlayer() {
         textController,
         uriFragmentModel,
         domStorage,
-        segmentBaseController;
+        segmentBaseController,
+        superEventBus,
+        playerId;
 
     /*
     ---------------------------------------------------------------------------
@@ -180,6 +182,7 @@ function MediaPlayer() {
         videoModel = VideoModel(context).getInstance();
         uriFragmentModel = URIFragmentModel(context).getInstance();
     }
+
 
     /**
      * Configure media player with customs controllers. Helpful for tests
@@ -458,8 +461,6 @@ function MediaPlayer() {
         if (videoModel.getElement() || streamingInitialized) {
             return false;
         }
-
-        
 
         if (source) {
             console.log('init');
@@ -1370,6 +1371,27 @@ function MediaPlayer() {
     function setView(element) {
         videoModel.setElement(element);
     }
+
+    function registerSuperEvent(superbus) {
+        superEventBus = superbus;
+        superEventBus.on(Events.TESTEVENT, talert, instance);
+    }
+
+    function unregisterSuperEvent() {
+        superEventBus.off(Events.TESTEVENT, talert, instance);    
+    }
+
+    function setPlayerId (id) {
+        playerId = id;
+    }
+    
+    function talert(e) {
+        if (e.id == playerId){
+            alert("supereventbuswork");
+        }
+    }
+
+
     /**
      * Returns instance of Div that was attached by calling attachTTMLRenderingDiv()
      * @returns {Object}
@@ -2236,6 +2258,9 @@ function MediaPlayer() {
         extend: extend,
         attachView: attachView,
         setView: setView,
+        registerSuperEvent: registerSuperEvent,
+        unregisterSuperEvent: unregisterSuperEvent,
+        setPlayerId: setPlayerId,
         attachSource: attachSource,
         isReady: isReady,
         preload: preload,

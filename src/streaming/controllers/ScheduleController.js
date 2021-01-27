@@ -169,13 +169,18 @@ function ScheduleController(config) {
 
         validateExecutedFragmentRequest();
 
+        console.log('in schedule');
+
         const isReplacement = replaceRequestArray.length > 0;
         // bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack) checks the buffer length
         if (replacingBuffer || isNaN(lastInitQuality) || switchTrack || isReplacement ||
             hasTopQualityChanged(type, streamId) ||
             bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack)) {
 
+                console.log('in ttt');
+
             const getNextFragment = function () {
+                console.log('in getNextFragment');
                 if ((currentRepresentationInfo.quality !== lastInitQuality || switchTrack) && (!replacingBuffer)) {
                     if (switchTrack) {
                         logger.debug('Switch track for ' + type + ', representation id = ' + currentRepresentationInfo.id);
@@ -217,12 +222,12 @@ function ScheduleController(config) {
                         });
                         checkPlaybackQuality = true;
 
-                        // console.log('===========');
-                        // console.log(instance);
-                        // console.log(streamId);
-                        // console.log(type);
-                        // console.log(seekTarget);
-                        // console.log(replacement);
+                        console.log('===========');
+                        console.log(instance);
+                        console.log(streamId);
+                        console.log(type);
+                        console.log(seekTarget);
+                        console.log(replacement);
                     }
                 }
             };
