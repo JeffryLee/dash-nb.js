@@ -127,7 +127,7 @@ function ScheduleController(config) {
     }
 
     function start() {
-        console.log('schedule controller start');
+        // console.log('schedule controller start');
         if (isStarted()) return;
         if (!currentRepresentationInfo || bufferController.getIsBufferingCompleted()) return;
 
@@ -139,7 +139,7 @@ function ScheduleController(config) {
             initialRequest = false;
         }
 
-        console.log('schedule controller start2');
+        // console.log('schedule controller start2');
         
         startScheduleTimer(0);
     }
@@ -184,11 +184,9 @@ function ScheduleController(config) {
 
         const isReplacement = replaceRequestArray.length > 0;
 
+        let getQuota = false;
         if (typeof bufferQuota !== 'undefined') {
-            console.log(bufferQuota);
-            let status = bufferQuota.checkQuota();
-            console.log('9999999999999999999');
-            console.log(status);
+            getQuota = bufferQuota.checkQuota() > 0;
         }
 
         
@@ -198,6 +196,22 @@ function ScheduleController(config) {
             bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack)) {
 
             const getNextFragment = function () {
+
+                // var xhr = new XMLHttpRequest();
+                // xhr.open("POST", "http://localhost:8333", false);
+                // xhr.onreadystatechange = function() {
+                //     if ( xhr.readyState == 4 && xhr.status == 200 ) {
+                //         console.log("GOT RESPONSE:" + xhr.responseText + "---");
+                //         // if ( xhr.responseText == "REFRESH" ) {
+                //         //     document.location.reload(true);
+                //         // }
+                //     }
+                // }
+                // var data = {'nextChunkSize': 1, 'Type': 'BB', 'lastquality': 1, 'buffer': 5, 'bufferAdjusted': 5, 'bandwidthEst': 10, 'lastRequest': 1, 'RebufferTime': 1, 'lastChunkFinishTime': 1, 'lastChunkStartTime': 1, 'lastChunkSize': 1};
+                // xhr.send(JSON.stringify(data));
+
+
+
                 if ((currentRepresentationInfo.quality !== lastInitQuality || switchTrack) && (!replacingBuffer)) {
                     if (switchTrack) {
                         logger.debug('Switch track for ' + type + ', representation id = ' + currentRepresentationInfo.id);
@@ -251,7 +265,7 @@ function ScheduleController(config) {
 
             setFragmentProcessState(true);
             if (!isReplacement && checkPlaybackQuality) {
-                abrController.checkPlaybackQuality(type);
+                abrController.checkPlaybackQuality(type, bufferController.getRebufferTime());
             }
 
             getNextFragment();

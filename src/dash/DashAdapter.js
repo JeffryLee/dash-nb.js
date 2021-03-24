@@ -316,8 +316,8 @@ function DashAdapter() {
         const streams = [];
         let voLocalPeriods = voPeriods;
 
-        console.log('voPeriods');
-        console.log(voPeriods);
+        // console.log('voPeriods');
+        // console.log(voPeriods);
 
         //if manifest is defined, getStreamsInfo is for an outside manifest, not the current one
         if (externalManifest) {
@@ -729,6 +729,9 @@ function DashAdapter() {
         if (!adaptation) {
             return null;
         }
+        
+        // console.log('adaptation');
+        // console.log(adaptation);
 
         let mediaInfo = new MediaInfo();
         const realAdaptation = adaptation.period.mpd.manifest.Period_asArray[adaptation.period.index].AdaptationSet_asArray[adaptation.index];
@@ -772,6 +775,9 @@ function DashAdapter() {
         mediaInfo.codec = dashManifestModel.getCodec(realAdaptation);
         mediaInfo.mimeType = dashManifestModel.getMimeType(realAdaptation);
         mediaInfo.contentProtection = dashManifestModel.getContentProtectionData(realAdaptation);
+
+        // console.log('realAdaptation');
+        // console.log(realAdaptation);
         mediaInfo.bitrateList = dashManifestModel.getBitrateListForAdaptation(realAdaptation);
 
         if (mediaInfo.contentProtection) {

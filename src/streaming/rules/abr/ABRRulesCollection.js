@@ -151,14 +151,142 @@ function ABRRulesCollection(config) {
         return SwitchRequest(context).create(quality);
     }
 
-    function getMaxQuality(rulesContext) {
+
+    function last_chunk_size(lastreq) {
+        var tot = 0;
+        for ( var tt = 0; tt < lastreq.trace.length; tt++ ) {
+            tot = tot + lastreq.trace[tt]['b'][0];
+        }
+        return tot;
+    }
+
+
+    function predict_throughput(lastHTTPRequest) {
+        var lastDownloadTime,
+        lastThroughput = 0,
+        lastChunkSize;
+
+        // First, log last download time and throughput
+        if (lastHTTPRequest != null && lastHTTPRequest !== undefined) {
+            lastDownloadTime = (lastHTTPRequest._tfinish.getTime() - lastHTTPRequest.tresponse.getTime()) / 1000; //seconds
+            
+            if (lastDownloadTime <0.1) {
+                lastDownloadTime = 0.1;
+            }
+            lastChunkSize = last_chunk_size(lastHTTPRequest);
+            lastThroughput = lastChunkSize*8/lastDownloadTime/1000;
+        }
+
+        return lastThroughput;   
+    }
+
+    function decodeRuleConext(rulesContext, playerId, lastRequested, last_quality, rebuffer) {
+
+
+        const mediaInfo = rulesContext.getMediaInfo();
+        const mediaType = rulesContext.getMediaType();
+        const scheduleController = rulesContext.getScheduleController();
+        const streamInfo = rulesContext.getStreamInfo();
+        const abrController = rulesContext.getAbrController();
+        const throughputHistory = abrController.getThroughputHistory();
+        const streamId = streamInfo ? streamInfo.id : null;
+        const isDynamic = streamInfo && streamInfo.manifestInfo && streamInfo.manifestInfo.isDynamic;
+        const useBufferOccupancyABR = rulesContext.useBufferOccupancyABR();
+        
+        const bitrates = mediaInfo.bitrateList.map(b => b.bandwidth);
+        // console.log(mediaInfo);
+        
+        // console.log('bitrates '+bitrates);
+        // console.log();
+
+        // console.log('scheduleController');
+        // console.log(scheduleController);
+        // console.log(rulesContext.getStreamInfo());
+        // console.log(streamId);
+
+        // if (mediaInfo) {
+        //     console.log('duration '+ mediaInfo.streamInfo.duration);
+        // }
+
+        
+
+        // console.log('mediaType '+ mediaType);
+
+        // console.log('CurrentBufferLevel '+ dashMetrics.getCurrentBufferLevel(mediaType));
+        
+
+        var lastHTTPRequest = dashMetrics.getCurrentHttpRequest(mediaType);
+
+        var bandwidthEst = 0;
+        var lastChunkFinishTime = 0;
+        var lastChunkStartTime = 0;
+        var lastChunkSize = 0;
+
+        if (lastHTTPRequest) {
+            // var lastDownloadTime = (lastHTTPRequest._tfinish.getTime() - lastHTTPRequest.tresponse.getTime()) / 1000;
+
+            // console.log('lastDownloadTime ' + lastDownloadTime);
+
+            // console.log('lastChunkSize ' + last_chunk_size(lastHTTPRequest));
+
+            bandwidthEst = predict_throughput(lastHTTPRequest);
+
+            lastChunkFinishTime = lastHTTPRequest._tfinish.getTime(), 
+            lastChunkStartTime = lastHTTPRequest.tresponse.getTime(), 
+            lastChunkSize = last_chunk_size(lastHTTPRequest)
+        }
+
+        // console.log('rebuffer '+ rebuffer);
+
+        // console.log('last_quality '+ last_quality);
+
+        // console.log(lastHTTPRequest);
+
+        var buffer = dashMetrics.getCurrentBufferLevel(mediaType);
+
+
+
+        // lastRequested
+
+        
+
+        console.log(data);
+
+
+        var quality = 2;
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:8333", false);
+        xhr.onreadystatechange = function() {
+            if ( xhr.readyState == 4 && xhr.status == 200 ) {
+                console.log("GOT RESPONSE:" + xhr.responseText + "---");
+                if ( xhr.responseText != "REFRESH" ) {
+                    quality = parseInt(xhr.responseText, 10);
+                } else {
+                    document.location.reload(true);
+                }
+            }
+        }
+        
+        var data = {'nextChunkSize': bitrates, 'Type': 'BB', 'lastquality': last_quality, 'buffer': buffer, 'bandwidthEst': bandwidthEst, 'lastRequest': lastRequested, 'RebufferTime': rebuffer, 'lastChunkFinishTime': lastChunkFinishTime, 'lastChunkStartTime': lastChunkStartTime, 'lastChunkSize': lastChunkSize, 'playerId': playerId};
+        xhr.send(JSON.stringify(data));
+        console.log("QUALITY RETURNED IS: " + quality);        
+
+        
+        // const stableBufferTime = mediaPlayerModel.getStableBufferTime();
+        // console.log('stableBufferTime: ' + stableBufferTime);
+        // console.log();
+
+    }
+
+    function getMaxQuality(rulesContext, playerId=-1, lastRequested=0, last_quality=0, rebuffer=0) {
+
         const switchRequestArray = qualitySwitchRules.map(rule => rule.getMaxIndex(rulesContext));
 
-        // console.log(switchRequestArray);
+        decodeRuleConext(rulesContext, playerId, lastRequested, last_quality, rebuffer);
+
+
         const activeRules = getActiveRules(switchRequestArray);
-        // console.log(activeRules);
         const maxQuality = getMinSwitchRequest(activeRules);
-        // console.log(maxQuality);
 
         return maxQuality || SwitchRequest(context).create();
     }

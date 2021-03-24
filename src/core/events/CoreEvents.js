@@ -87,6 +87,7 @@ class CoreEvents extends EventsBase {
         this.INITQUOTA = 'initQuota';
         this.INITQUOTAREQUEST = 'initQuotaRequest';
         this.TESTEVENT = 'testEvent';
+        this.UPDATE_REQUEST_INDEX = 'updateRequestIndex';
     }
 }
 

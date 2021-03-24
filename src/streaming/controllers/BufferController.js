@@ -68,6 +68,9 @@ function BufferController(config) {
     const type = config.type;
     const settings = config.settings;
 
+    let total_rebuffer_time = 0;
+    let start_rebuffer = -1;
+
     let instance,
         logger,
         requiredQuality,
@@ -571,9 +574,22 @@ function BufferController(config) {
         // So, when in low latency mode, change dash.js behavior so it notifies a stall just when
         // buffer reach 0 seconds
         if (((!settings.get().streaming.lowLatencyEnabled && bufferLevel < STALL_THRESHOLD) || bufferLevel === 0) && !isBufferingCompleted) {
+            
+            if ( start_rebuffer == -1 ) {
+                start_rebuffer = Date.now();
+            }
+            
             notifyBufferStateChanged(MetricsConstants.BUFFER_EMPTY);
         } else {
             if (isBufferingCompleted || bufferLevel >= streamInfo.manifestInfo.minBufferTime) {
+
+                var curr_rebuffer_time = 0;
+                if ( start_rebuffer != -1 ) {
+                    curr_rebuffer_time = Date.now() - start_rebuffer;
+                    start_rebuffer = -1;
+                }
+                total_rebuffer_time += curr_rebuffer_time;
+
                 notifyBufferStateChanged(MetricsConstants.BUFFER_LOADED);
             }
         }
@@ -799,6 +815,10 @@ function BufferController(config) {
         return bufferLevel;
     }
 
+    function getRebufferTime() {
+        return total_rebuffer_time;
+    }
+
     function setMediaSource(value, mediaInfo) {
         mediaSource = value;
         if (buffer && mediaInfo) { //if we have a prebuffer, we should prepare to discharge it, and make a new sourceBuffer ready
@@ -912,6 +932,7 @@ function BufferController(config) {
         getBuffer,
         setBuffer,
         getBufferLevel,
+        getRebufferTime: getRebufferTime,
         getRangeAt,
         setMediaSource,
         getMediaSource,

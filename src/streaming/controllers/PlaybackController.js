@@ -103,11 +103,8 @@ function PlaybackController() {
     }
 
     function onStreamInitialized(e) {
-        console.log('onStreamInitialized');
         // Seamless period switch
         if (streamSwitch && isNaN(streamSeekTime)) return;
-
-        console.log('onStreamInitialized1');
 
         // Seek new stream in priority order:
         // - at seek time (streamSeekTime) when switching period
@@ -115,7 +112,6 @@ function PlaybackController() {
         // - at stream/period start time (for static streams) or live start time (for dynamic streams)
         let startTime = streamSeekTime;
         if (isNaN(startTime)) {
-            console.log('onStreamInitialized2');
             if (isDynamic) {
                 // For dynamic stream, start by default at (live edge - live delay)
                 startTime = e.liveStartTime;
@@ -141,8 +137,6 @@ function PlaybackController() {
                 }
             }
         }
-
-        console.log('onStreamInitialized4');
 
         if (!isNaN(startTime) && startTime !== videoModel.getTime()) {
             // Trigger PLAYBACK_SEEKING event for controllers

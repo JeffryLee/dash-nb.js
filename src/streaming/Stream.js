@@ -225,8 +225,8 @@ function Stream(config) {
         for (let i = 0; i < streamProcessors.length; i++) {
             //Adding of new tracks to a stream processor isn't guaranteed by the spec after the METADATA_LOADED state
             //so do this after the buffers are created above.
-            console.log('streamProcessors.length: ' + streamProcessors.length);
-            console.log(streamProcessors[i].getMediaInfo());
+            // console.log('streamProcessors.length: ' + streamProcessors.length);
+            // console.log(streamProcessors[i].getMediaInfo());
             
             streamProcessors[i].dischargePreBuffer();
         }
@@ -627,7 +627,7 @@ function Stream(config) {
     }
 
     function checkIfInitializationCompleted() {
-        console.log('checkIfInitializationCompleted');
+        // console.log('checkIfInitializationCompleted');
         const ln = streamProcessors.length;
         const hasError = !!updateError.audio || !!updateError.video;
         let error = hasError ? new DashJSError(Errors.DATA_UPDATE_FAILED_ERROR_CODE, Errors.DATA_UPDATE_FAILED_ERROR_MESSAGE) : null;
@@ -638,13 +638,13 @@ function Stream(config) {
             }
         }
 
-        console.log('checkIfInitializationCompleted2');
+        // console.log('checkIfInitializationCompleted2');
 
         if (!isMediaInitialized) {
             return;
         }
 
-        console.log('checkIfInitializationCompleted3');
+        // console.log('checkIfInitializationCompleted3');
 
         if (protectionController) {
             // Need to check if streamProcessors exists because streamProcessors
@@ -937,7 +937,7 @@ function Stream(config) {
 
             createBuffers(previousBuffers);
 
-            console.log('start ScheduleController');
+            // console.log('start ScheduleController');
 
             eventBus.on(Events.CURRENT_TRACK_CHANGED, onCurrentTrackChanged, instance);
             for (let i = 0; i < streamProcessors.length && streamProcessors[i]; i++) {

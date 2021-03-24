@@ -1360,9 +1360,9 @@ function MediaPlayer() {
             // detectMetricsReporting();
             // detectMss();
             
-            console.log("streamController out");
+            // console.log("streamController out");
             if (streamController) {
-                console.log("streamController called");
+                // console.log("streamController called");
                 streamController.switchToVideoElement();
             }
         }
@@ -1412,6 +1412,7 @@ function MediaPlayer() {
     function initSonPlayer (id, superbus) {
         sonFlag = true;
         setPlayerId(id);
+        abrController.setPlayerId(id);
         registerSuperEvent(superbus);
     }
     

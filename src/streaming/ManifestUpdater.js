@@ -146,6 +146,9 @@ function ManifestUpdater() {
             return;
         }
 
+        // console.log('manifest');
+        // console.log(manifest);
+
         manifestModel.setValue(manifest);
 
         const date = new Date();

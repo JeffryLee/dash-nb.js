@@ -248,7 +248,6 @@ function StreamController() {
     }
 
     function startCheckIfPrebufferingCanStartInterval() {
-        console.log('startCheckIfPrebufferingCanStartInterval');
         if (!prebufferingCanStartInterval) {
             prebufferingCanStartInterval = setInterval(function () {
                 checkIfPrebufferingCanStart();
@@ -670,8 +669,8 @@ function StreamController() {
     function composeStreams() {
         try {
             const streamsInfo = adapter.getStreamsInfo();
-            console.log("streamsInfo");
-            console.log(streamsInfo);
+            // console.log("streamsInfo");
+            // console.log(streamsInfo);
             if (streamsInfo.length === 0) {
                 throw new Error('There are no streams');
             }

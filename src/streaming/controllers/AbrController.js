@@ -56,6 +56,10 @@ function AbrController() {
     const debug = Debug(context).getInstance();
     const eventBus = EventBus(context).getInstance();
 
+    let last_quality;
+    let playerId = -1;
+
+
     let instance,
         logger,
         abrRulesCollection,
@@ -73,6 +77,7 @@ function AbrController() {
         mediaPlayerModel,
         domStorage,
         playbackIndex,
+        lastRequestIndex,
         switchHistoryDict,
         droppedFramesHistory,
         throughputHistory,
@@ -99,6 +104,7 @@ function AbrController() {
         }
         eventBus.on(Events.METRIC_ADDED, onMetricAdded, this);
         eventBus.on(Events.PERIOD_SWITCH_COMPLETED, createAbrRulesCollection, this);
+        eventBus.on(Events.UPDATE_REQUEST_INDEX, onLastRequestIndexUpdate, this);
 
         throughputHistory = throughputHistory || ThroughputHistory(context).create({
             settings: settings
@@ -134,6 +140,7 @@ function AbrController() {
         throughputHistory = undefined;
         clearTimeout(abandonmentTimeout);
         abandonmentTimeout = null;
+        lastRequestIndex = -1;
     }
 
     function reset() {
@@ -144,6 +151,10 @@ function AbrController() {
         eventBus.off(Events.QUALITY_CHANGE_RENDERED, onQualityChangeRendered, this);
         eventBus.off(Events.METRIC_ADDED, onMetricAdded, this);
         eventBus.off(Events.PERIOD_SWITCH_COMPLETED, createAbrRulesCollection, this);
+        eventBus.off(Events.UPDATE_REQUEST_INDEX, onLastRequestIndexUpdate, this);
+
+
+        
 
         if (abrRulesCollection) {
             abrRulesCollection.reset();
@@ -189,8 +200,15 @@ function AbrController() {
         }
     }
 
+    function onLastRequestIndexUpdate(e) {
+        lastRequestIndex = e.index;
+    } 
+
     function onMetricAdded(e) {
         if (e.metric === MetricsConstants.HTTP_REQUEST && e.value && e.value.type === HTTPRequest.MEDIA_SEGMENT_TYPE && (e.mediaType === Constants.AUDIO || e.mediaType === Constants.VIDEO)) {
+            // console.log('metric type');
+            // console.log(e.metric);
+            // console.log(e.value);
             throughputHistory.push(e.mediaType, e.value, settings.get().streaming.abr.useDeadTimeLatency);
         }
 
@@ -297,7 +315,7 @@ function AbrController() {
         }
     }
 
-    function checkPlaybackQuality(type) {
+    function checkPlaybackQuality(type, rebuffer=0) {
         if (type  && streamProcessorDict && streamProcessorDict[type]) {
             const streamInfo = streamProcessorDict[type].getStreamInfo();
             const streamId = streamInfo ? streamInfo.id : null;
@@ -320,8 +338,23 @@ function AbrController() {
             if (!!settings.get().streaming.abr.autoSwitchBitrate[type]) {
                 const minIdx = getMinAllowedIndexFor(type);
                 const topQualityIdx = getTopQualityIndexFor(type, streamId);
-                const switchRequest = abrRulesCollection.getMaxQuality(rulesContext);
+
+                var last_quality_idx = -1;
+
+                if (last_quality) {
+                    last_quality_idx = last_quality;
+                }
+
+                // console.log('lastRequestIndex '+ lastRequestIndex);
+
+                const switchRequest = abrRulesCollection.getMaxQuality(rulesContext, playerId, lastRequestIndex, last_quality, rebuffer);
                 let newQuality = switchRequest.quality;
+
+
+                last_quality = newQuality;
+
+
+                // if quality is not valid, return -1
                 if (minIdx !== undefined && ((newQuality > SwitchRequest.NO_CHANGE) ? newQuality : oldQuality) < minIdx) {
                     newQuality = minIdx;
                 }
@@ -341,6 +374,8 @@ function AbrController() {
                 }
             }
         }
+
+        // if quality is valid, return 0
     }
 
     function setPlaybackQuality(type, streamInfo, newQuality, reason) {
@@ -638,6 +673,15 @@ function AbrController() {
         }
     }
 
+
+    function getPlayerId() {
+        return playerId;
+    }
+
+    function setPlayerId(pid) {
+        playerId = pid;
+    }
+
     instance = {
         isPlayingAtTopQuality: isPlayingAtTopQuality,
         updateTopQualityIndex: updateTopQualityIndex,
@@ -659,6 +703,8 @@ function AbrController() {
         registerStreamType: registerStreamType,
         unRegisterStreamType: unRegisterStreamType,
         setConfig: setConfig,
+        getPlayerId: getPlayerId,
+        setPlayerId: setPlayerId,
         reset: reset
     };
 
