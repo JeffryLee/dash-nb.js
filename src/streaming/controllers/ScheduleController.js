@@ -173,7 +173,6 @@ function ScheduleController(config) {
 
     function schedule() {
 
-        console.log("schedule");
         if (isStopped || isFragmentProcessingInProgress ||
             (playbackController.isPaused() && !settings.get().streaming.scheduleWhilePaused) ||
             ((type === Constants.FRAGMENTED_TEXT || type === Constants.TEXT) && !textController.isTextEnabled()) ||
@@ -186,9 +185,6 @@ function ScheduleController(config) {
         validateExecutedFragmentRequest();
 
         const isReplacement = replaceRequestArray.length > 0;
-
-        console.log("schedule1");
-
         
         // bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack) checks the buffer length
         if (replacingBuffer || isNaN(lastInitQuality) || switchTrack || isReplacement ||

@@ -213,7 +213,8 @@ function AbrController() {
     }
 
     function onLastRequestIndexUpdate(e) {
-        if (e.mediatype = "video") {
+        console.log(e);
+        if (e.mediatype == "video") {
             lastRequestIndexv = e.index;
         } else {
             console.log("e.type");
