@@ -75,9 +75,23 @@ def make_request_handler(input_dict):
             post_data = json.loads(self.rfile.read(content_length))
             print post_data
 
+
+            return_code = -2
+
+            if (post_data['playerId'] == post_data['currentPlayerIdx']):
+                return_code = len(post_data['nextChunkSize'])-1
             
-            send_data = str(4)
-                
+
+            if (post_data['playerId'] == (post_data['currentPlayerIdx']+1)%8):
+                if (post_data['lastRequest'] < 3):
+                    return_code = len(post_data['nextChunkSize'])-1
+            
+            if (post_data['lastRequest'] < 0):
+                return_code = len(post_data['nextChunkSize'])-1
+
+            
+            send_data = str(return_code)
+            print "return " + send_data    
             self.send_response(200)
             self.send_header('Content-Type', 'text/plain')
             self.send_header('Content-Length', len(send_data))

@@ -320,7 +320,8 @@ function DashHandler(config) {
 
         let indexToRequest = segmentIndex + 1;
 
-        eventBus.trigger(events.UPDATE_REQUEST_INDEX,  {index: indexToRequest});
+        eventBus.trigger(events.UPDATE_REQUEST_INDEX,  {mediatype: mediaInfo.type, index: indexToRequest});
+        
 
         logger.debug('Getting the next request at index: ' + indexToRequest);
         // console.log('Getting the next request at index: ' + indexToRequest);

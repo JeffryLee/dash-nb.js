@@ -477,6 +477,8 @@ function MediaPlayer() {
 
         initQuota();
 
+        // updateUrl(source);
+
         // resetPlaybackControllers();
     }
 
@@ -1384,10 +1386,18 @@ function MediaPlayer() {
         
         superEventBus = superbus;
         superEventBus.on(Events.TESTEVENT, talert, instance);
+        superEventBus.on(Events.PLAYERCHANGEREQUEST, receivePlayerChangeRequest, instance);
+
+        eventBus.on(Events.URLUPDATEREQUEST, updateUrl, self);
+        
+        
     }
 
     function unregisterSuperEvent() {
-        superEventBus.off(Events.TESTEVENT, talert, instance);    
+        superEventBus.off(Events.TESTEVENT, talert, instance); 
+        superEventBus.off(Events.PLAYERCHANGEREQUEST, receivePlayerChangeRequest, instance);  
+        
+        eventBus.off(Events.URLUPDATEREQUEST, updateUrl, self);
     }
 
     function initQuota () {
@@ -1427,6 +1437,21 @@ function MediaPlayer() {
 
         
         // eventBus.trigger(Events.TESTEVENT);
+    }
+
+    function receivePlayerChangeRequest(e) {
+        eventBus.trigger(Events.PLAYERCHANGE, {
+            currentPlayer: e.currentPlayer
+        });
+    }
+
+
+    function updateUrl(e) {
+        eventBus.trigger(Events.URLUPDATE, {
+            url: source
+        });
+        console.log("updateUrl");
+        console.log(source);
     }
 
 
@@ -1850,6 +1875,9 @@ function MediaPlayer() {
         if (isReady()) {
             initializePlayback();
         }
+
+        
+        
     }
 
     /**

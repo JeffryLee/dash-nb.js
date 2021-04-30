@@ -32,6 +32,7 @@
 import FactoryMaker from '../../core/FactoryMaker';
 
 const NO_CHANGE = -1;
+const SKIP_BUFFER = -2;
 const PRIORITY = {
     DEFAULT: 0.5,
     STRONG: 1,
@@ -74,6 +75,7 @@ SwitchRequest.__dashjs_factory_name = 'SwitchRequest';
 const factory = FactoryMaker.getClassFactory(SwitchRequest);
 factory.NO_CHANGE = NO_CHANGE;
 factory.PRIORITY = PRIORITY;
+factory.SKIP_BUFFER = SKIP_BUFFER;
 FactoryMaker.updateClassFactory(SwitchRequest.__dashjs_factory_name, factory);
 
 export default factory;

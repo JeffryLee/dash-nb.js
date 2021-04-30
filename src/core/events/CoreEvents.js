@@ -86,6 +86,10 @@ class CoreEvents extends EventsBase {
         this.DYNAMIC_STREAM_COMPLETED = 'dynamicStreamCompleted';
         this.INITQUOTA = 'initQuota';
         this.INITQUOTAREQUEST = 'initQuotaRequest';
+        this.PLAYERCHANGE = 'playerChange';
+        this.PLAYERCHANGEREQUEST = 'playerChangeRequest';
+        this.URLUPDATE = 'urlUpdate';
+        this.URLUPDATEREQUEST = 'urlUpdateRequest';
         this.TESTEVENT = 'testEvent';
         this.UPDATE_REQUEST_INDEX = 'updateRequestIndex';
     }

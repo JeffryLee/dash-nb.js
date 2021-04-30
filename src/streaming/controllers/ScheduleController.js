@@ -172,10 +172,13 @@ function ScheduleController(config) {
     // }
 
     function schedule() {
+
+        console.log("schedule");
         if (isStopped || isFragmentProcessingInProgress ||
             (playbackController.isPaused() && !settings.get().streaming.scheduleWhilePaused) ||
             ((type === Constants.FRAGMENTED_TEXT || type === Constants.TEXT) && !textController.isTextEnabled()) ||
             bufferController.getIsBufferingCompleted()) {
+
             stop();
             return;
         }
@@ -184,10 +187,7 @@ function ScheduleController(config) {
 
         const isReplacement = replaceRequestArray.length > 0;
 
-        let getQuota = false;
-        if (typeof bufferQuota !== 'undefined') {
-            getQuota = bufferQuota.checkQuota() > 0;
-        }
+        console.log("schedule1");
 
         
         // bufferLevelRule.execute(type, currentRepresentationInfo, hasVideoTrack) checks the buffer length
@@ -262,13 +262,19 @@ function ScheduleController(config) {
                     }
                 }
             };
-
+            var ret = 0;
             setFragmentProcessState(true);
             if (!isReplacement && checkPlaybackQuality) {
-                abrController.checkPlaybackQuality(type, bufferController.getRebufferTime());
+                ret = abrController.checkPlaybackQuality(type, bufferController.getRebufferTime());
             }
-
-            getNextFragment();
+            
+            // if the return value means not buffer, sleep and do not buffer
+            if (ret == -1) {
+                setFragmentProcessState(false);
+                startScheduleTimer(500);
+            } else {
+                getNextFragment();
+            }
 
         } else {
             startScheduleTimer(500);

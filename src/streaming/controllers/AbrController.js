@@ -58,7 +58,8 @@ function AbrController() {
 
     let last_quality;
     let playerId = -1;
-
+    let currentPlayerIdx = 0;
+    let url = "";
 
     let instance,
         logger,
@@ -77,7 +78,8 @@ function AbrController() {
         mediaPlayerModel,
         domStorage,
         playbackIndex,
-        lastRequestIndex,
+        lastRequestIndexv,
+        lastRequestIndexa,
         switchHistoryDict,
         droppedFramesHistory,
         throughputHistory,
@@ -105,6 +107,12 @@ function AbrController() {
         eventBus.on(Events.METRIC_ADDED, onMetricAdded, this);
         eventBus.on(Events.PERIOD_SWITCH_COMPLETED, createAbrRulesCollection, this);
         eventBus.on(Events.UPDATE_REQUEST_INDEX, onLastRequestIndexUpdate, this);
+        eventBus.on(Events.PLAYERCHANGE, oncurrentPlayerIdxUpdate, this);
+        eventBus.on(Events.URLUPDATE, onurlupdate, this);
+
+
+        eventBus.trigger(Events.URLUPDATEREQUEST);
+        
 
         throughputHistory = throughputHistory || ThroughputHistory(context).create({
             settings: settings
@@ -140,7 +148,10 @@ function AbrController() {
         throughputHistory = undefined;
         clearTimeout(abandonmentTimeout);
         abandonmentTimeout = null;
-        lastRequestIndex = -1;
+        lastRequestIndexv = -1;
+        lastRequestIndexa = -1;
+        currentPlayerIdx = 0;
+        url = "";
     }
 
     function reset() {
@@ -152,7 +163,8 @@ function AbrController() {
         eventBus.off(Events.METRIC_ADDED, onMetricAdded, this);
         eventBus.off(Events.PERIOD_SWITCH_COMPLETED, createAbrRulesCollection, this);
         eventBus.off(Events.UPDATE_REQUEST_INDEX, onLastRequestIndexUpdate, this);
-
+        eventBus.off(Events.PLAYERCHANGE, oncurrentPlayerIdxUpdate, this);
+        eventBus.off(Events.URLUPDATE, onurlupdate, this);
 
         
 
@@ -201,8 +213,25 @@ function AbrController() {
     }
 
     function onLastRequestIndexUpdate(e) {
-        lastRequestIndex = e.index;
+        if (e.mediatype = "video") {
+            lastRequestIndexv = e.index;
+        } else {
+            console.log("e.type");
+            console.log(e.type);
+            lastRequestIndexa = e.index;
+        }
     } 
+
+    function oncurrentPlayerIdxUpdate(e) {
+        currentPlayerIdx = e.currentPlayer;
+    }
+
+
+    function onurlupdate(e) {
+        url = e.url;
+    }
+
+    
 
     function onMetricAdded(e) {
         if (e.metric === MetricsConstants.HTTP_REQUEST && e.value && e.value.type === HTTPRequest.MEDIA_SEGMENT_TYPE && (e.mediaType === Constants.AUDIO || e.mediaType === Constants.VIDEO)) {
@@ -339,19 +368,35 @@ function AbrController() {
                 const minIdx = getMinAllowedIndexFor(type);
                 const topQualityIdx = getTopQualityIndexFor(type, streamId);
 
-                var last_quality_idx = -1;
+                // var last_quality_idx = -1;
 
-                if (last_quality) {
-                    last_quality_idx = last_quality;
-                }
+                // if (last_quality) {
+                //     last_quality_idx = last_quality;
+                // }
 
                 // console.log('lastRequestIndex '+ lastRequestIndex);
 
-                const switchRequest = abrRulesCollection.getMaxQuality(rulesContext, playerId, lastRequestIndex, last_quality, rebuffer);
+                const switchRequest = abrRulesCollection.getMaxQuality(rulesContext, playerId, lastRequestIndexv, lastRequestIndexa, last_quality, rebuffer, currentPlayerIdx, url);
+                
+                console.log("currentPlayerIdx "+currentPlayerIdx);
+
+
+                if (switchRequest.quality === SwitchRequest.SKIP_BUFFER) {
+                    return -1;
+                }
+
                 let newQuality = switchRequest.quality;
 
 
-                last_quality = newQuality;
+                var mediaInfo = rulesContext.getMediaInfo();
+
+                if (mediaInfo.type == "video") {
+                    last_quality = newQuality;
+                }
+
+                
+
+                // need to handle quality here for no buffering here
 
 
                 // if quality is not valid, return -1
@@ -374,6 +419,8 @@ function AbrController() {
                 }
             }
         }
+
+        return 0;
 
         // if quality is valid, return 0
     }

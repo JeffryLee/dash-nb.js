@@ -93,6 +93,8 @@ function SuperPlayer() {
 
     const queueLength = 8;
 
+    var startplayed = 0;
+
     
 
     let instance,
@@ -177,11 +179,32 @@ function SuperPlayer() {
         superEventBus.trigger(Events.TESTEVENT, {
             id: playIdx
         });
+
+        // startPlay the first video
+        if (startplayed == 0) {
+            if (playIdx != loadIdx) {
+                players[playIdx].attachView(playerview);
+
+                superEventBus.trigger(Events.PLAYERCHANGEREQUEST, {
+                    currentPlayer: playIdx
+                });
+
+                startplayed = 1;
+            }
+            return 0;
+        }
+
+
+
         var ret = popFromQueue();
         if (ret == 0) {
 
             if (playIdx != loadIdx) {
                 players[playIdx].attachView(playerview);
+
+                superEventBus.trigger(Events.PLAYERCHANGEREQUEST, {
+                    currentPlayer: playIdx
+                });
             }
 
             return ret;

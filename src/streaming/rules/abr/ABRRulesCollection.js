@@ -180,8 +180,9 @@ function ABRRulesCollection(config) {
         return lastThroughput;   
     }
 
-    function decodeRuleConext(rulesContext, playerId, lastRequested, last_quality, rebuffer) {
 
+    // todo solve last request video and audio conflict
+    function decodeRuleConext(rulesContext, playerId, lastRequestedv, lastRequesteda, last_quality, rebuffer, currentPlayerIdx, url) {
 
         const mediaInfo = rulesContext.getMediaInfo();
         const mediaType = rulesContext.getMediaType();
@@ -244,11 +245,15 @@ function ABRRulesCollection(config) {
 
         var buffer = dashMetrics.getCurrentBufferLevel(mediaType);
 
-
-
         // lastRequested
 
-        
+        if (mediaInfo.type == "audio") {
+            if (lastRequesteda < lastRequestedv) {
+                return 0;
+            } else {
+                return -2;
+            }
+        }
 
         console.log(data);
 
@@ -258,7 +263,7 @@ function ABRRulesCollection(config) {
         xhr.open("POST", "http://localhost:8333", false);
         xhr.onreadystatechange = function() {
             if ( xhr.readyState == 4 && xhr.status == 200 ) {
-                console.log("GOT RESPONSE:" + xhr.responseText + "---");
+                // console.log("GOT RESPONSE:" + xhr.responseText + "---");
                 if ( xhr.responseText != "REFRESH" ) {
                     quality = parseInt(xhr.responseText, 10);
                 } else {
@@ -266,29 +271,35 @@ function ABRRulesCollection(config) {
                 }
             }
         }
-        
-        var data = {'nextChunkSize': bitrates, 'Type': 'BB', 'lastquality': last_quality, 'buffer': buffer, 'bandwidthEst': bandwidthEst, 'lastRequest': lastRequested, 'RebufferTime': rebuffer, 'lastChunkFinishTime': lastChunkFinishTime, 'lastChunkStartTime': lastChunkStartTime, 'lastChunkSize': lastChunkSize, 'playerId': playerId};
-        xhr.send(JSON.stringify(data));
-        console.log("QUALITY RETURNED IS: " + quality);        
 
+        // need current header
+        // need request url
         
+        var data = {'nextChunkSize': bitrates, 'Type': 'BB', 'lastquality': last_quality, 'buffer': buffer, 'bandwidthEst': bandwidthEst, 'lastRequest': lastRequestedv, 'RebufferTime': rebuffer, 'lastChunkFinishTime': lastChunkFinishTime, 'lastChunkStartTime': lastChunkStartTime, 'lastChunkSize': lastChunkSize, 'playerId': playerId, 'currentPlayerIdx': currentPlayerIdx, 'url': url};
+        xhr.send(JSON.stringify(data));
+
+        return quality;
         // const stableBufferTime = mediaPlayerModel.getStableBufferTime();
         // console.log('stableBufferTime: ' + stableBufferTime);
         // console.log();
 
     }
 
-    function getMaxQuality(rulesContext, playerId=-1, lastRequested=0, last_quality=0, rebuffer=0) {
+    function getMaxQuality(rulesContext, playerId=-1, lastRequestedv=-1, lastRequesteda=-1, last_quality=0, rebuffer=0, currentPlayerIdx=0, url="") {
 
         const switchRequestArray = qualitySwitchRules.map(rule => rule.getMaxIndex(rulesContext));
 
-        decodeRuleConext(rulesContext, playerId, lastRequested, last_quality, rebuffer);
+        var quality = decodeRuleConext(rulesContext, playerId, lastRequestedv, lastRequesteda, last_quality, rebuffer, currentPlayerIdx, url);
 
+        // console.log("QUALITY RETURNED IS: " + quality);
 
-        const activeRules = getActiveRules(switchRequestArray);
-        const maxQuality = getMinSwitchRequest(activeRules);
+        // const activeRules = getActiveRules(switchRequestArray);
 
-        return maxQuality || SwitchRequest(context).create();
+        // const maxQuality = getMinSwitchRequest(activeRules);
+
+        // return maxQuality || SwitchRequest(context).create();
+
+        return SwitchRequest(context).create(quality) // get the quality from python server.
     }
 
     function shouldAbandonFragment(rulesContext) {
