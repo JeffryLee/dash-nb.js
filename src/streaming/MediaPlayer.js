@@ -352,6 +352,39 @@ function MediaPlayer() {
     }
 
     /**
+     * When user proceed to the next video, the function is called to send the command to the ABR server and reset the state of mediaplayer
+     */
+    function recycle() {
+
+        let videoViewTime = videoModel.getTime()
+        let timestamp = new Date().getTime();
+        
+        updateServer(source, videoViewTime, timestamp);
+        reset();
+    }
+
+    function updateServer(url, videoViewTime, timestamp) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:8333", false);
+        // xhr.onreadystatechange = function() {
+        //     if ( xhr.readyState == 4 && xhr.status == 200 ) {
+        //         // console.log("GOT RESPONSE:" + xhr.responseText + "---");
+        //         if ( xhr.responseText != "REFRESH" ) {
+        //             quality = parseInt(xhr.responseText, 10);
+        //         } else {
+        //             document.location.reload(true);
+        //         }
+        //     }
+        // }
+
+        // need current header
+        // need request url
+        
+        var data = {'Type': 'swipe', 'viewTime': videoViewTime, 'swipeTime': timestamp, 'url': url};
+        xhr.send(JSON.stringify(data));
+    }
+
+    /**
      * Sets the MPD source and the video element to null. You can also reset the MediaPlayer by
      * calling attachSource with a new source file.
      *
@@ -468,8 +501,8 @@ function MediaPlayer() {
         }
 
         if (source) {
-            console.log('init');
-            console.log(source);
+            // console.log('init');
+            // console.log(source);
             initializePlayback();
         } else {
             throw SOURCE_NOT_ATTACHED_ERROR;
@@ -600,6 +633,10 @@ function MediaPlayer() {
      */
     function getPlaybackRate() {
         return getVideoElement().playbackRate;
+    }
+
+    function getcurrentPlayerIdx() {
+        return abrController.getcurrentPlayerIdx();
     }
 
     /**
@@ -897,6 +934,7 @@ function MediaPlayer() {
                 thumbnailController.setTrackByIndex(value);
             }
         }
+        console.log("[quality] setQualityFor " + value);
         abrController.setPlaybackQuality(type, streamController.getActiveStreamInfo(), value);
     }
 
@@ -1419,6 +1457,10 @@ function MediaPlayer() {
         playerId = id;
     }
 
+    function getPlayerId (id) {
+        return playerId;
+    }
+
     function initSonPlayer (id, superbus) {
         sonFlag = true;
         setPlayerId(id);
@@ -1450,8 +1492,8 @@ function MediaPlayer() {
         eventBus.trigger(Events.URLUPDATE, {
             url: source
         });
-        console.log("updateUrl");
-        console.log(source);
+        // console.log("updateUrl");
+        // console.log(source);
     }
 
 
@@ -2325,6 +2367,7 @@ function MediaPlayer() {
         attachView: attachView,
         setView: setView,
         initSonPlayer: initSonPlayer,
+        getPlayerId: getPlayerId,
         attachSource: attachSource,
         isReady: isReady,
         preload: preload,
@@ -2336,6 +2379,7 @@ function MediaPlayer() {
         seek: seek,
         setPlaybackRate: setPlaybackRate,
         getPlaybackRate: getPlaybackRate,
+        getcurrentPlayerIdx: getcurrentPlayerIdx,
         setMute: setMute,
         isMuted: isMuted,
         setVolume: setVolume,
@@ -2406,7 +2450,8 @@ function MediaPlayer() {
         getSettings: getSettings,
         updateSettings: updateSettings,
         resetSettings: resetSettings,
-        reset: reset
+        reset: reset,
+        recycle: recycle
     };
 
     setup();

@@ -215,7 +215,6 @@ function StreamController() {
         } else {
             if (isPaused) {
                 isPaused = false;
-                console.log("resume");
                 createPlaylistMetrics(PlayList.RESUME_FROM_PAUSE_START_REASON);
             }
         }
@@ -224,7 +223,6 @@ function StreamController() {
     function onPlaybackPaused(e) {
         logger.debug('[onPlaybackPaused]');
         if (!e.ended) {
-            console.log("paused");
             isPaused = true;
             flushPlaylistMetrics(PlayListTrace.USER_REQUEST_STOP_REASON);
         }
@@ -559,7 +557,6 @@ function StreamController() {
     }
 
     function switchToVideoElement(seekTime) {
-        console.log('seekTime:' +seekTime);
         if (activeStream) {
             playbackController.initialize(getActiveStreamInfo());
             openMediaSource(seekTime, false, true, false);

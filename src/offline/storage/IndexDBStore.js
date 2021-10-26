@@ -74,7 +74,7 @@ function IndexDBStore() {
     function createFragmentStore(storeName) {
 
         if (!fragmentStores[storeName]) {
-            console.log('setStore  ' + storeName);
+            // console.log('setStore  ' + storeName);
             let fragmentStore = localforage.createInstance({
                 driver: localforage.INDEXEDDB,
                 name: 'dash_offline_db',

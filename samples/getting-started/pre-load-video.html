@@ -15,6 +15,13 @@
             players,
             idx,
             superplayer
+        
+        function control_bar() {
+            var progress = document.getElementById('progress');
+		    var progressBar = document.getElementById('progress-bar');
+            var supportsProgress = (document.createElement('progress').max !== undefined);
+		    if (!supportsProgress) progress.setAttribute('data-state', 'fake');
+        }
 
         function init() {
             // var urls = ["https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd", "https://bitmovin-a.akamaihd.net/content/playhouse-vr/mpds/105560.mpd", "https://dash.akamaized.net/dash264/TestCasesIOP41/MultiTrack/alternative_content/1/manifest_alternative_content_live.mpd"];
@@ -34,6 +41,7 @@
             var videoContainer = document.getElementById('videoContainer');
             if (!video) {
                 video = document.createElement('video');
+                video.setAttribute("id", "video");
                 video.controls = true;
                 videoContainer.appendChild(video);
             }
@@ -74,12 +82,6 @@
         }
     </script>
 
-    <style>
-        video {
-            width: 640px;
-            height: 360px;
-        }
-    </style>
 </head>
 
 <body>
@@ -90,18 +92,35 @@
     <!-- <div>
         <button onclick="attachVideoPlayer()">Attach View</button>
     </div> -->
-    <div>
-        <button onclick="next()">Next</button>
-    </div>
+
+
+    <!-- <div id="videoContainer">
+    </div> -->
+    
 
     <div id="videoContainer">
+		<video id="video">
+		</video>
+		<!-- <div id="video-controls" class="controls" data-state="hidden">
+			<button id="playpause" type="button" data-state="play">Play/Pause</button>
+			<button id="stop" type="button" data-state="stop">Stop</button>
+			<div class="progress">
+				<progress id="progress" value="0" min="0">
+					<span id="progress-bar"></span>
+				</progress>
+			</div>
+		</div> -->
+	</div>
+
+    <div>
+        <button id="nextbutton" onclick="next()">Next</button>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             init();
         });
     </script>
-    <script src="../highlighter.js"></script>
 </body>
 
 </html>

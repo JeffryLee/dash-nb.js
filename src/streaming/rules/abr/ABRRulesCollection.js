@@ -195,25 +195,6 @@ function ABRRulesCollection(config) {
         const useBufferOccupancyABR = rulesContext.useBufferOccupancyABR();
         
         const bitrates = mediaInfo.bitrateList.map(b => b.bandwidth);
-        // console.log(mediaInfo);
-        
-        // console.log('bitrates '+bitrates);
-        // console.log();
-
-        // console.log('scheduleController');
-        // console.log(scheduleController);
-        // console.log(rulesContext.getStreamInfo());
-        // console.log(streamId);
-
-        // if (mediaInfo) {
-        //     console.log('duration '+ mediaInfo.streamInfo.duration);
-        // }
-
-        
-
-        // console.log('mediaType '+ mediaType);
-
-        // console.log('CurrentBufferLevel '+ dashMetrics.getCurrentBufferLevel(mediaType));
         
 
         var lastHTTPRequest = dashMetrics.getCurrentHttpRequest(mediaType);
@@ -222,26 +203,24 @@ function ABRRulesCollection(config) {
         var lastChunkFinishTime = 0;
         var lastChunkStartTime = 0;
         var lastChunkSize = 0;
+        var mediaduration = 0;
 
         if (lastHTTPRequest) {
-            // var lastDownloadTime = (lastHTTPRequest._tfinish.getTime() - lastHTTPRequest.tresponse.getTime()) / 1000;
-
-            // console.log('lastDownloadTime ' + lastDownloadTime);
-
-            // console.log('lastChunkSize ' + last_chunk_size(lastHTTPRequest));
 
             bandwidthEst = predict_throughput(lastHTTPRequest);
 
-            lastChunkFinishTime = lastHTTPRequest._tfinish.getTime(), 
-            lastChunkStartTime = lastHTTPRequest.tresponse.getTime(), 
-            lastChunkSize = last_chunk_size(lastHTTPRequest)
+            lastChunkFinishTime = lastHTTPRequest._tfinish.getTime(); 
+            lastChunkStartTime = lastHTTPRequest.tresponse.getTime(); 
+            lastChunkSize = last_chunk_size(lastHTTPRequest);
+            mediaduration = lastHTTPRequest._mediaduration;
+
+            // console.log("[kkk1] " + lastHTTPRequest._mediaduration);
         }
 
-        // console.log('rebuffer '+ rebuffer);
+        // console.log("[kkk] " + lastHTTPRequest);
 
-        // console.log('last_quality '+ last_quality);
-
-        // console.log(lastHTTPRequest);
+        // console.log("[kkk1] " + lastHTTPRequest._mediaduration);
+        // console.log("[kkk2] " + lastHTTPRequest._serviceLocation);
 
         var buffer = dashMetrics.getCurrentBufferLevel(mediaType);
 
@@ -255,7 +234,7 @@ function ABRRulesCollection(config) {
             }
         }
 
-        console.log(data);
+        // console.log('[onFragmentLoadingCompleted2] ' + lastRequestedv + 1 + " " + mediaduration + " " + lastChunkStartTime + " " + (lastChunkFinishTime - lastChunkStartTime));
 
 
         var quality = 2;
@@ -275,14 +254,10 @@ function ABRRulesCollection(config) {
         // need current header
         // need request url
         
-        var data = {'nextChunkSize': bitrates, 'Type': 'BB', 'lastquality': last_quality, 'buffer': buffer, 'bandwidthEst': bandwidthEst, 'lastRequest': lastRequestedv, 'RebufferTime': rebuffer, 'lastChunkFinishTime': lastChunkFinishTime, 'lastChunkStartTime': lastChunkStartTime, 'lastChunkSize': lastChunkSize, 'playerId': playerId, 'currentPlayerIdx': currentPlayerIdx, 'url': url};
+        var data = {'nextChunkSize': bitrates, 'Type': 'download', 'lastquality': last_quality, 'buffer': buffer, 'bandwidthEst': bandwidthEst, 'lastRequest': lastRequestedv, 'RebufferTime': rebuffer, 'lastChunkFinishTime': lastChunkFinishTime, 'lastChunkStartTime': lastChunkStartTime, 'lastChunkSize': lastChunkSize, 'playerId': playerId, 'currentPlayerIdx': currentPlayerIdx, 'url': url, 'duration': mediaduration};
         xhr.send(JSON.stringify(data));
 
         return quality;
-        // const stableBufferTime = mediaPlayerModel.getStableBufferTime();
-        // console.log('stableBufferTime: ' + stableBufferTime);
-        // console.log();
-
     }
 
     function getMaxQuality(rulesContext, playerId=-1, lastRequestedv=-1, lastRequesteda=-1, last_quality=0, rebuffer=0, currentPlayerIdx=0, url="") {
@@ -291,7 +266,10 @@ function ABRRulesCollection(config) {
 
         var quality = decodeRuleConext(rulesContext, playerId, lastRequestedv, lastRequesteda, last_quality, rebuffer, currentPlayerIdx, url);
 
-        // console.log("QUALITY RETURNED IS: " + quality);
+        if (quality != -2) {
+            // console.log("QUALITY RETURNED IS: " + quality);
+        }
+        
 
         // const activeRules = getActiveRules(switchRequestArray);
 
@@ -307,7 +285,10 @@ function ABRRulesCollection(config) {
         const activeRules = getActiveRules(abandonRequestArray);
         const shouldAbandon = getMinSwitchRequest(activeRules);
 
-        return shouldAbandon || SwitchRequest(context).create();
+        // return shouldAbandon || SwitchRequest(context).create();
+
+        // Never abandon here
+        return SwitchRequest(context).create(SwitchRequest.NO_CHANGE);
     }
 
     function reset() {

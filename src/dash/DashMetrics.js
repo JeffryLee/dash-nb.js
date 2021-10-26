@@ -336,6 +336,7 @@ function DashMetrics(config) {
      * @ignore
      */
     function addHttpRequest(request, responseURL, responseStatus, responseHeaders, traces) {
+        // console.log("[httprequest] " + request.requestStartDate + " " + request.requestEndDate + " " + request.duration+ " " + (request.requestEndDate - request.requestStartDate));
         metricsModel.addHttpRequest(request.mediaType,
             null,
             request.type,

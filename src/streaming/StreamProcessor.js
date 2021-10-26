@@ -85,7 +85,8 @@ function StreamProcessor(config) {
         liveEdgeFinder,
         indexHandler,
         bufferingTime,
-        bufferPruned;
+        bufferPruned,
+        InitTimeout;
 
     function setup() {
         logger = Debug(context).getInstance().getLogger(instance);
@@ -234,6 +235,12 @@ function StreamProcessor(config) {
         if (e.sender.getType() !== getType() || e.sender.getStreamId() !== streamInfo.id) return;
 
         if (!e.error) {
+            let representation = adapter.convertDataToRepresentationInfo(e.currentRepresentation);
+            
+            if (representation.mediaInfo.type == "video") {
+                console.log("[init] onDataUpdateCompleted " + representation.quality);
+            }
+
             // Update representation if no error
             scheduleController.setCurrentRepresentation(adapter.convertDataToRepresentationInfo(e.currentRepresentation));
         }
@@ -249,6 +256,7 @@ function StreamProcessor(config) {
     function onQualityChanged(e) {
         if (type !== e.mediaType || streamInfo.id !== e.streamInfo.id) return;
         // console.log('onQualityChanged in StreamProcessor');
+        // console.log("[init] onQualityChanged " + e.newQuality);
         let representationInfo = getRepresentationInfo(e.newQuality);
         scheduleController.setCurrentRepresentation(representationInfo);
         dashMetrics.pushPlayListTraceMetrics(new Date(), PlayListTrace.REPRESENTATION_SWITCH_STOP_REASON);
@@ -333,6 +341,37 @@ function StreamProcessor(config) {
         return streamInfo;
     }
 
+    function getInitBitrate(mediaInfo, bitrate) {
+        let retquality;
+
+        function startInitTimer(value) {
+            clearTimeout(InitTimeout);
+    
+            InitTimeout = setTimeout(sendRequest, value);
+        }
+
+        function sendRequest() {
+            let p = new Promise((resolve, reject) => {
+                let q = abrController.requestABRServerInit(mediaInfo, bitrate);
+                if (q != -2) {
+                    resolve(q);
+                } else {
+                    reject(q);
+                }
+            });
+
+            p.then((quality) => {
+                retquality = quality;
+            }).catch((quality) => {
+                startInitTimer(500)
+            });
+        }
+
+        startInitTimer(0);
+        return retquality
+    }
+
+
     function selectMediaInfo(newMediaInfo) {
         if (newMediaInfo !== mediaInfo && (!newMediaInfo || !mediaInfo || (newMediaInfo.type === mediaInfo.type))) {
             mediaInfo = newMediaInfo;
@@ -353,9 +392,13 @@ function StreamProcessor(config) {
             if ((realAdaptation === null || (realAdaptation.id != newRealAdaptation.id)) && type !== Constants.FRAGMENTED_TEXT) {
                 averageThroughput = abrController.getThroughputHistory().getAverageThroughput(type);
                 bitrate = averageThroughput || abrController.getInitialBitrateFor(type);
+                // quality = abrController.requestABRServerInit(mediaInfo, bitrate);
                 quality = abrController.getQualityForBitrate(mediaInfo, bitrate);
+                // todo: when return -2, it should block the buffering somewhere
+                // console.log("getQualityForBitrate");
             } else {
                 quality = abrController.getQualityFor(type);
+                // console.log("getQualityFor");
             }
 
             if (minIdx !== undefined && quality < minIdx) {
@@ -365,6 +408,16 @@ function StreamProcessor(config) {
                 quality = maxQuality;
             }
             indexHandler.setMimeType(mediaInfo ? mediaInfo.mimeType : null);
+
+            // console.log("selectMdeiaInfo " + quality + " - " + maxQuality + " - " + minIdx)
+            quality = 0;
+            if (type == "video") {
+                quality = 1;
+            }
+
+            if (type == "video") {
+                console.log("[init] updateRepresentation " + quality);
+            }
             representationController.updateData(newRealAdaptation, voRepresentations, type, quality);
         }
     }
@@ -376,6 +429,7 @@ function StreamProcessor(config) {
 
         if (selectNewMediaInfo) {
             this.selectMediaInfo(newMediaInfo);
+            // console.log("addMediaInfo");
         }
     }
 
@@ -501,6 +555,7 @@ function StreamProcessor(config) {
         }
 
         if (requestToReplace) {
+            // console.log("requestToReplace");
             time = requestToReplace.startTime + (requestToReplace.duration / 2);
             request = getFragmentRequest(representationInfo, time, {
                 timeThreshold: 0,
@@ -525,6 +580,8 @@ function StreamProcessor(config) {
 
             // console.log(request);
         }
+
+        // console.log("request quality " + request.quality)
 
         return request;
     }

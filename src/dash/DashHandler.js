@@ -162,6 +162,8 @@ function DashHandler(config) {
         request.mediaInfo = mediaInfo;
         request.representationId = representation.id;
 
+        // console.log("init request quality: " + request.quality);
+
         if (setRequestUrl(request, representation.initialization, representation)) {
             request.url = replaceTokenForTemplate(request.url, 'Bandwidth', representation.bandwidth);
             return request;
@@ -190,6 +192,8 @@ function DashHandler(config) {
     }
 
     function processRepresentation(voRepresentation) {
+        // console.log(voRepresentation);
+        // console.log("[init] processRepresentation " + voRepresentation.quality);
         const hasInitialization = voRepresentation.hasInitialization();
         const hasSegments = voRepresentation.hasSegments();
 
@@ -239,7 +243,7 @@ function DashHandler(config) {
         
 
         if (setRequestUrl(request, url, representation)) {
-            console.log(request.mediaType + request.index + " " + request.url);
+            // console.log(request.mediaType + request.index + " " + request.url);
             return request;
         }
         
@@ -324,11 +328,6 @@ function DashHandler(config) {
         
 
         logger.debug('Getting the next request at index: ' + indexToRequest);
-        // console.log('Getting the next request at index: ' + indexToRequest);
-
-        // console.log("====");
-        // console.log(representation);
-        // console.log("****");
 
         // check that there is a segment in this index
         const segment = segmentsController.getSegmentByIndex(representation, indexToRequest, lastSegment ? lastSegment.mediaStartTime : -1);
@@ -372,11 +371,11 @@ function DashHandler(config) {
     function onInitializationLoaded(e) {
         const representation = e.representation;
         if (!representation.segments) return;
-
-        eventBus.trigger(events.REPRESENTATION_UPDATE_COMPLETED, {sender: this, representation: representation});
+                eventBus.trigger(events.REPRESENTATION_UPDATE_COMPLETED, {sender: this, representation: representation});
     }
 
     function onSegmentsLoaded(e) {
+        // console.log("onSegmentsLoaded");
         if (e.error || (getType() !== e.mediaType)) return;
 
         const fragments = e.segments;

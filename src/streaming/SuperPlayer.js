@@ -124,6 +124,10 @@ function SuperPlayer() {
             // players[i].registerSuperEvent();
         }
 
+        superEventBus.trigger(Events.PLAYERCHANGEREQUEST, {
+            currentPlayer: playIdx
+        });
+
         
     }
 
@@ -159,18 +163,16 @@ function SuperPlayer() {
     }
 
     function popFromQueue() {
-        console.log('playIdx: '+playIdx);
-        console.log('loadIdx: '+loadIdx);
+        // console.log('playIdx: '+playIdx);
+        // console.log('loadIdx: '+loadIdx);
 
         if (playIdx == loadIdx) {
             return -1;
         }
         
-        players[playIdx].reset();
+        players[playIdx].recycle();
 
-        playIdx = playIdx + 1;
-
-        playIdx = playIdx % queueLength;
+        playIdx = (playIdx + 1) % queueLength;
 
         return 0;
     }
@@ -194,7 +196,14 @@ function SuperPlayer() {
             return 0;
         }
 
+        var outstr = "snapshot: ";
 
+        for (var i = 0; i < queueLength; i++) {
+            outstr = outstr + players[i].getcurrentPlayerIdx() + " ";
+            // players[i].registerSuperEvent();
+        }
+
+        console.log(outstr);
 
         var ret = popFromQueue();
         if (ret == 0) {

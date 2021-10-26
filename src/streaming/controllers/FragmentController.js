@@ -132,6 +132,8 @@ function FragmentController( config ) {
         const isInit = request.isInitializationRequest();
         const streamInfo = request.mediaInfo.streamInfo;
 
+        // console.log('[onFragmentLoadingCompleted] ' + request.index + " " + request.duration + " " + request.startTime + " " + (request.requestEndDate - request.requestStartDate));
+
         if (streamInfo && streamInfo.id !== streamId) return;
 
         if (e.error) {

@@ -227,6 +227,13 @@ function ScheduleController(config) {
                     });
                     lastInitQuality = currentRepresentationInfo.quality;
                     checkPlaybackQuality = false;
+                    // console.log("INIT_FRAGMENT_NEEDED1 >>>>> " + currentRepresentationInfo.quality);
+                    
+                    // currentRepresentationInfo
+                    if (currentRepresentationInfo.mediaInfo.type == "video"){
+                        console.log("[init] schedule1 " + currentRepresentationInfo.quality + " -- " + currentRepresentationInfo.mediaInfo.streamInfo.duration + " -- "  + abrController.getLastIndex());
+                    }
+                    
                 } else {
                     const replacement = replaceRequestArray.shift();
 
@@ -239,6 +246,11 @@ function ScheduleController(config) {
                             representationId: replacement.representationId
                         });
                         checkPlaybackQuality = false;
+                        // console.log("INIT_FRAGMENT_NEEDED2 ");
+                        if (currentRepresentationInfo.mediaInfo.type == "video"){
+                            console.log("[init] schedule2 " + currentRepresentationInfo.quality);
+                        }
+
                     } else {
                         eventBus.trigger(Events.MEDIA_FRAGMENT_NEEDED, {
                             sender: instance,
@@ -249,18 +261,20 @@ function ScheduleController(config) {
                         });
                         checkPlaybackQuality = true;
 
-                        // console.log('===========');
-                        // console.log(instance);
-                        // console.log(streamId);
-                        // console.log(type);
-                        // console.log(seekTarget);
-                        // console.log(replacement);
+                        if (currentRepresentationInfo.mediaInfo.type == "video"){
+                            console.log(currentRepresentationInfo);
+                            // console.log()
+                            console.log("[init] schedule3 " + currentRepresentationInfo.quality + " -- " + currentRepresentationInfo.mediaInfo.streamInfo.duration + " -- "  + abrController.getLastIndex());
+                        }
                     }
                 }
             };
             var ret = 0;
             setFragmentProcessState(true);
+            // console.log("<<<<<<<<");
+            // console.log("checkPlaybackQuality0");
             if (!isReplacement && checkPlaybackQuality) {
+                console.log("[buffer] " + bufferController.getRebufferTime());
                 ret = abrController.checkPlaybackQuality(type, bufferController.getRebufferTime());
             }
             
@@ -306,6 +320,8 @@ function ScheduleController(config) {
 
             if (fastSwitchModeEnabled && (trackChanged || qualityChanged) && bufferLevel >= safeBufferLevel && abandonmentState !== MetricsConstants.ABANDON_LOAD) {
                 replaceRequest(request);
+                // console.log("replaceRequest - validateExecutedFragmentRequest")
+
                 isReplacementRequest = true;
                 logger.debug('Reloading outdated fragment at index: ', request.index);
             } else if (request.quality > currentRepresentationInfo.quality && !replacingBuffer) {
@@ -407,6 +423,7 @@ function ScheduleController(config) {
 
         if (e.error && e.request.serviceLocation && !isStopped) {
             replaceRequest(e.request);
+            // console.log("replaceRequest - onFragmentLoadingCompleted")
             setFragmentProcessState(false);
             startScheduleTimer(0);
         }
@@ -454,6 +471,8 @@ function ScheduleController(config) {
         if (!playbackController.isSeeking() && !switchTrack) {
             logger.info('onFragmentLoadingAbandoned request: ' + e.request.url + ' has to be downloaded again, origin is not seeking process or switch track call');
             replaceRequest(e.request);
+            // console.log("replaceRequest - onFragmentLoadingAbandoned")
+
         }
         setFragmentProcessState(false);
         startScheduleTimer(0);

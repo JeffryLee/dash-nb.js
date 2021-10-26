@@ -351,7 +351,6 @@ function BolaRule(config) {
     function onQualityChangeRequested(e) {
         // Useful to store change requests when abandoning a download.
         if (e) {
-            // console.log('onQualityChanged in Bola Rule');
             const bolaState = bolaStateDict[e.mediaType];
             if (bolaState && bolaState.state !== BOLA_STATE_ONE_BITRATE) {
                 bolaState.abrQuality = e.newQuality;

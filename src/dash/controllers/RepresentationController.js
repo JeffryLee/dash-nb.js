@@ -105,6 +105,8 @@ function RepresentationController(config) {
     }
 
     function updateData(newRealAdaptation, availableRepresentations, type, quality) {
+        // console.log("ttt");
+        // console.log("[init] updateData0" + quality);
         checkConfig();
 
         startDataUpdate();
@@ -114,6 +116,8 @@ function RepresentationController(config) {
         // console.log(voAvailableRepresentations);
 
         currentVoRepresentation = getRepresentationForQuality(quality);
+
+        // console.log("[init] updateData" + currentVoRepresentation.quality);
         realAdaptation = newRealAdaptation;
 
         if (type !== Constants.VIDEO && type !== Constants.AUDIO && type !== Constants.FRAGMENTED_TEXT) {
@@ -226,6 +230,7 @@ function RepresentationController(config) {
     }
 
     function onRepresentationUpdated(e) {
+        // console.log("onRepresentationUpdated");
         if (e.sender.getType() !== getType() || e.sender.getStreamInfo().id !== streamId || !isUpdating()) return;
 
         if (e.error) {
@@ -269,6 +274,7 @@ function RepresentationController(config) {
         }
 
         if (isAllRepresentationsUpdated()) {
+            console.log("[quality] isAllRepresentationsUpdated " + getType() + " " + getQualityForRepresentation(currentVoRepresentation));
             abrController.setPlaybackQuality(getType(), streamInfo, getQualityForRepresentation(currentVoRepresentation));
             dashMetrics.updateManifestUpdateInfo({latency: currentVoRepresentation.segmentAvailabilityRange.end - playbackController.getTime()});
 
